@@ -266,8 +266,10 @@ if ok then
       local line = L.linenoise(prompt())
 
       -- Save:
-      L.historyadd(line)
-      L.historysave(history)
+      if line then
+         L.historyadd(line)
+         L.historysave(history)
+      end
 
       -- Return line:
       return line
@@ -288,15 +290,27 @@ function repl()
       local line = readline()
 
       -- Interupt?
-      if line == 'break' or line == 'exit' then
+      if not line or line == 'exit' then
+         io.write('Do you really want to exit ([y]/n)?') io.flush()
+         local line = io.read('*l')
+         if line == '' or line:lower() == 'y' then
+            os.exit()
+         end
+      end
+      if line == 'break' then
          break
       end
 
       -- OS Commands:
-      if line:find('^%s-%$') then
+      if line and line:find('^%s-%$') then
          line = line:gsub('^%s-%$','')
          os.execute(aliases .. ' ' .. line)
          line = nil
+      end
+
+      -- Support the crappy '=', as Lua does:
+      if line and line:find('^%s-=') then
+         line = 'print(' .. line:gsub('^%s-=','') .. ')'
       end
 
       -- EVAL:
