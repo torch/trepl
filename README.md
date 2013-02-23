@@ -26,7 +26,7 @@ luajit -ltrepl
 With Torch7:
 
 ```
-torch-lua -ltrepl
+torch-lua -ltrepl -ltorch
 ```
 
 With Torch9 (coming soon):
