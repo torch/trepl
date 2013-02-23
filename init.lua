@@ -237,7 +237,7 @@ end
 local ok,L = pcall(require,'linenoise')
 if ok then
    -- History:
-   local history = 'history.txt'
+   local history = os.getenv('HOME') .. '/.luahistory'
    L.historyload(history)
 
    -- Completion:
