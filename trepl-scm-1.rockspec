@@ -16,7 +16,7 @@ An embedabble, Lua-only REPL for Torch.
 }
 
 dependencies = {
-   "torch >= 7.0",
+   "torch >= 7.1",
    "linenoise >= 0.4"
 }
 
@@ -24,5 +24,10 @@ build = {
    type = "builtin",
    modules = {
       ['trepl.init'] = 'init.lua',
+   },
+   install = {
+      bin = {
+         'trepl'
+      }
    }
 }
