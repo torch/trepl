@@ -266,7 +266,7 @@ if ok then
       local line = L.linenoise(prompt())
 
       -- Save:
-      if line then
+      if line and not line:find('^%s-$') then
          L.historyadd(line)
          L.historysave(history)
       end
@@ -281,17 +281,22 @@ local aliases = [[
    alias ls='ls -GF';
    alias ll='ls -lhF';
    alias la='ls -ahF';
+   alias lla='ls -lahF';
 ]]
 
 -- The REPL:
 function repl()
+   -- Reults:
+   _RESULTS = {}
+
+   -- REPL:
    while true do
       -- READ:
       local line = readline()
 
       -- Interupt?
       if not line or line == 'exit' then
-         io.write('Do you really want to exit ([y]/n)?') io.flush()
+         io.write('Do you really want to exit ([y]/n)? ') io.flush()
          local line = io.read('*l')
          if line == '' or line:lower() == 'y' then
             os.exit()
@@ -304,19 +309,27 @@ function repl()
       -- OS Commands:
       if line and line:find('^%s-%$') then
          line = line:gsub('^%s-%$','')
-         os.execute(aliases .. ' ' .. line)
+         if io.popen then
+            local f = io.popen(aliases .. ' ' .. line)
+            local res = f:read('*a')
+            f:close()
+            io.write(c('_black',res)) io.flush()
+            table.insert(_RESULTS, res)
+         else
+            os.execute(aliases .. ' ' .. line)
+         end
          line = nil
       end
 
       -- Support the crappy '=', as Lua does:
       if line and line:find('^%s-=') then
-         line = 'print(' .. line:gsub('^%s-=','') .. ')'
+         line = 'local res = ' .. line:gsub('^%s-=','') .. ' print(res) table.insert(_RESULTS,res)'
       end
 
       -- EVAL:
       if line then
          -- Try to print first, always:
-         local ok,err = xpcall(loadstring('print('..line..')'), traceback)
+         local ok,err = xpcall(loadstring('local res = '..line..' print(res) table.insert(_RESULTS,res)'), traceback)
          if not ok then
             local ok,err = xpcall(loadstring(line), traceback)
             if not ok then
@@ -325,6 +338,10 @@ function repl()
          end
          counter = counter + 1
       end
+
+      -- Last result:
+      _LAST = _RESULTS[#_RESULTS]
+      if not _ then _ = _LAST end
    end
 end
 
