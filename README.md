@@ -94,3 +94,18 @@ that's only used if not already defined:
 test
 ```
 
+Hide output. By default, TREPL always tries to dump
+the content of what's evaluated. Use ; to stop it.
+
+```lua
+[Lua # 1] > a = torch.Tensor(3)
+[Lua # 1] > a:zero()
+0
+0
+0
+[torch.DoubleTensor of dimension 3]
+
+[Lua # 3] > a:zero();
+[Lua # 4] > 
+```
+
