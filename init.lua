@@ -337,8 +337,12 @@ function repl()
 
       -- EVAL:
       if line then
-         -- Try to print first, always:
-         local ok,err = xpcall(loadstring('local res = '..line..' print(res) table.insert(_RESULTS,res)'), traceback)
+         local ok,err
+         if line:find(';%s-$') then
+            ok = false
+         else
+            ok,err = xpcall(loadstring('local res = '..line..' print(res) table.insert(_RESULTS,res)'), traceback)
+         end
          if not ok then
             local ok,err = xpcall(loadstring(line), traceback)
             if not ok then
