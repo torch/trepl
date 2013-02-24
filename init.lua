@@ -284,6 +284,14 @@ local aliases = [[
    alias lla='ls -lahF';
 ]]
 
+-- Paths:
+local cpath = package.cpath .. ';'
+for cpath in cpath:gmatch('(.-);') do
+   if cpath:find('%.so') then
+      package.cpath = package.cpath .. ';' .. cpath:gsub('%.so','.dylib')
+   end
+end
+
 -- The REPL:
 function repl()
    -- Reults:
