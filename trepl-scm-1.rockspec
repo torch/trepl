@@ -16,7 +16,7 @@ An embedabble, Lua-only REPL for Torch.
 }
 
 dependencies = {
-   "torch >= 7.1",
+   "torch >= 7.1.alpha",
    "linenoise >= 0.4"
 }
 
