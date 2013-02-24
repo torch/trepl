@@ -127,10 +127,8 @@ local function getmaxlen(vars)
 end
 
 -- overload print:
-print_old=print
-_G._preloaded_ = {}
-for k,v in pairs(_G) do
-   _G._preloaded_[k] = true
+if not print_old then
+   print_old=print
 end
 
 -- a function to colorize output:
