@@ -290,6 +290,9 @@ for cpath in cpath:gmatch('(.-);') do
    end
 end
 
+-- Try to load env (Torch):
+pcall(require,'torch')
+
 -- The REPL:
 function repl()
    -- Reults:

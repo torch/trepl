@@ -1,14 +1,4 @@
 #!/usr/bin/env luajit
 
--- Paths:
-local cpath = package.cpath .. ';'
-for cpath in cpath:gmatch('(.-);') do
-   if cpath:find('%.so') then
-      package.cpath = package.cpath .. ';' .. cpath:gsub('%.so','.dylib')
-   end
-end
-
--- Load libs:
-require 'torch'
 require 'trepl'
 

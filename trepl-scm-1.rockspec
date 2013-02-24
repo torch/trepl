@@ -3,7 +3,7 @@ version = "scm-1"
 
 source = {
    url = "git://github.com/clementfarabet/trepl",
-   tag = "master",
+   branch = "master",
 }
 
 description = {
