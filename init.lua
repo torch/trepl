@@ -293,6 +293,24 @@ end
 -- Try to load env (Torch):
 pcall(require,'torch')
 
+-- Timer
+local timer_start, timer_stop
+if torch and torch.Timer then
+   local t = torch.Timer()
+   local start = 0
+   timer_start = function()
+      start = t:time().real
+   end
+   timer_stop = function()
+      local step = t:time().real - start
+      for i = 1,70 do io.write(' ') end
+      print(c('Black',string.format('[%0.04fs]', step)))
+   end
+else
+   timer_start = function() end
+   timer_stop = function() end
+end
+
 -- The REPL:
 function repl()
    -- Reults:
@@ -337,6 +355,7 @@ function repl()
 
       -- EVAL:
       if line then
+         timer_start()
          local ok,err
          if line:find(';%s-$') then
             ok = false
@@ -350,6 +369,7 @@ function repl()
             end
          end
          counter = counter + 1
+         timer_stop()
       end
 
       -- Last result:
