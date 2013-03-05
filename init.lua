@@ -201,7 +201,10 @@ function print(...)
                print_old()
             end
          end
-      else 
+      elseif getmetatable(obj).__tostring then
+         print_old(obj)
+         printrecursive(obj)
+      else
          printrecursive(obj) 
       end
    end
@@ -357,7 +360,7 @@ function repl()
       if line then
          timer_start()
          local ok,err
-         if line:find(';%s-$') then
+         if line:find(';%s-$') or line:find('^%s-print') then
             ok = false
          else
             ok,err = xpcall(loadstring('local res = '..line..' print(res) table.insert(_RESULTS,res)'), traceback)
