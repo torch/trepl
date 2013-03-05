@@ -243,19 +243,24 @@ if ok then
 
    -- Completion:
    L.setcompletion(function(c,s)
+      -- Get symbol of interest
+      local ignore,str = s:gfind('(.-)([a-zA-Z%._]*)$')()
+
       -- Lookup globals:
-      for k,v in pairs(_G) do
-         if k:find('^'..s) then
-            L.addcompletion(c,k)
+      if not str:find('%.') then
+         for k,v in pairs(_G) do
+            if k:find('^'..str) then
+               L.addcompletion(c,ignore .. k)
+            end
          end
       end
 
       -- Lookup packages:
-      local base,sub = s:gfind('(.-)%.(.*)')()
+      local base,sub = str:gfind('(.-)%.(.*)')()
       if base then
          for k,v in pairs(_G[base]) do
             if k:find('^'..sub) then
-               L.addcompletion(c,base .. '.' .. k)
+               L.addcompletion(c,ignore .. base .. '.' .. k)
             end
          end
       end
