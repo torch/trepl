@@ -201,7 +201,7 @@ function print(...)
                print_old()
             end
          end
-      elseif getmetatable(obj).__tostring then
+      elseif getmetatable(obj) and getmetatable(obj).__tostring then
          print_old(obj)
          printrecursive(obj)
       else
