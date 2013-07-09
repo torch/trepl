@@ -256,9 +256,10 @@ if ok then
       end
 
       -- Lookup packages:
-      local base,sub = str:gfind('(.-)%.(.*)')()
+      local base,sub = str:gfind('(.*)%.(.*)')()
       if base then
-         for k,v in pairs(_G[base]) do
+         local ok,res = pcall(loadstring('return ' .. base))
+         for k,v in pairs(res) do
             if k:find('^'..sub) then
                L.addcompletion(c,ignore .. base .. '.' .. k)
             end
