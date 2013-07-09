@@ -11,7 +11,8 @@ Options:
 
 -- parse arguments
 local run,interactive,progargs
-for _,arg in ipairs(arg) do
+local parg = arg
+for _,arg in ipairs(parg) do
    -- load libraries
    local _,_,lib = arg:find('^%-l(.*)')
    if lib then
@@ -46,6 +47,11 @@ for _,arg in ipairs(arg) do
          -- exec program
          run = arg
          progargs = {}
+         for k,v in pairs(parg) do
+            if k <= 0 then
+               progargs[k] = v
+            end
+         end
       end
    end
 end
