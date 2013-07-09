@@ -359,7 +359,7 @@ function repl()
 
       -- Support the crappy '=', as Lua does:
       if line and line:find('^%s-=') then
-         line = 'local res = ' .. line:gsub('^%s-=','') .. ' print(res) table.insert(_RESULTS,res)'
+         line = line:gsub('^%s-=','')
       end
 
       -- EVAL:
@@ -369,7 +369,7 @@ function repl()
          if line:find(';%s-$') or line:find('^%s-print') then
             ok = false
          else
-            ok,err = xpcall(loadstring('local res = '..line..' print(res) table.insert(_RESULTS,res)'), traceback)
+            ok,err = xpcall(loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])'), traceback)
          end
          if not ok then
             local ok,err = xpcall(loadstring(line), traceback)
