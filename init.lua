@@ -243,6 +243,33 @@ if ok then
 
    -- Completion:
    L.setcompletion(function(c,s)
+      -- Check if we're in a string
+      local ignore,str = s:gfind('(.-)"([a-zA-Z%._]*)$')()
+      local quote = '"'
+      if not str then
+         ignore,str = s:gfind('(.-)\'([a-zA-Z%._]*)$')()
+         quote = "'"
+      end
+
+      -- String?
+      if str then
+         -- PL?
+         local ok = pcall(require,'pl')
+
+         -- Disk completion
+         if ok then
+            local f = io.popen('ls ' .. str..'*')
+            local res = f:read('*all')
+            f:close()
+            res = res:gsub('(%s*)$','')
+            local elts = stringx.split(res,'\n')
+            for _,elt in ipairs(elts) do
+               L.addcompletion(c,ignore .. quote .. elt)
+            end
+         end
+         return
+      end
+
       -- Get symbol of interest
       local ignore,str = s:gfind('(.-)([a-zA-Z%._]*)$')()
 
