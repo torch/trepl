@@ -17,6 +17,11 @@
    Clement Farabet, 2013
 --]============================================================================]
 
+-- Try to load env: Torch, dok (for help function), and penlight for completion helpers:
+pcall(require,'torch')
+pcall(require,'dok')
+pcall(require,'pl')
+
 -- Colors:
 local colors = {
    none = '\27[0m',
@@ -253,11 +258,8 @@ if ok then
 
       -- String?
       if str then
-         -- PL?
-         local ok = pcall(require,'pl')
-
-         -- Disk completion
-         if ok then
+         -- Complete from disk:
+         if stringx then
             local f = io.popen('ls ' .. str..'*')
             local res = f:read('*all')
             f:close()
@@ -318,17 +320,6 @@ local aliases = [[
    alias lla='ls -lahF';
 ]]
 
--- Paths:
-local cpath = package.cpath .. ';'
-for cpath in cpath:gmatch('(.-);') do
-   if cpath:find('%.so') then
-      package.cpath = package.cpath .. ';' .. cpath:gsub('%.so','.dylib')
-   end
-end
-
--- Try to load env (Torch):
-pcall(require,'torch')
-
 -- Timer
 local timer_start, timer_stop
 if torch and torch.Timer then
@@ -387,6 +378,11 @@ function repl()
       -- Support the crappy '=', as Lua does:
       if line and line:find('^%s-=') then
          line = line:gsub('^%s-=','')
+      end
+      
+      -- Shortcut to get help:
+      if line and line:find('^%s-?') then
+         line = 'help(' .. line:gsub('^%s-?','') .. ')'
       end
 
       -- EVAL:
