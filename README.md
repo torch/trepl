@@ -8,6 +8,7 @@ Features:
 
 * Tab-completion on nested namespaces
 * Tab-completion on disk files (when opening a string)
+* Tab-completion on installed packages (start typing require "...)
 * History
 * Pretty print (table introspection and coloring)
 * Auto-print after eval (can be stopped with ;)
