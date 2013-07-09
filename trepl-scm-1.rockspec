@@ -27,7 +27,7 @@ build = {
    },
    install = {
       bin = {
-         'trepl'
+         'th'
       }
    }
 }

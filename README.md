@@ -14,32 +14,29 @@ Features:
 Install
 -------
 
-Via Luarocks:
+Via torch-rocks:
 
 ```
-luarocks install trepl
+torch-rocks install trepl
 ```
 
 Launch
 ------
 
-With pure Lua:
+We install a binary, simple to remember:
 
 ```
-lua -ltrepl
-luajit -ltrepl
+th
+> -- amazing repl!
 ```
 
-With Torch7:
+Alternatively, you can always bring up the repl by loading it as a lib,
+from anywhere:
 
 ```
-torch -ng -ltrepl
-```
-
-With Torch9 (coming soon):
-
-```
-luajit -ltrepl -ltorch
+torch
+> repl = require 'trepl'
+> repl()
 ```
 
 Use
@@ -88,9 +85,8 @@ test
    2 : test
 }
 
-_LAST: contains the last result, _ is a shortcut,
-that's only used if not already defined:
-[Lua # 5] > _
+_LAST: contains the last result
+[Lua # 5] > _LAST
 test
 ```
 
@@ -108,4 +104,3 @@ the content of what's evaluated. Use ; to stop it.
 [Lua # 3] > a:zero();
 [Lua # 4] > 
 ```
-

@@ -224,7 +224,7 @@ end
 -- Prompt:
 local counter = 1
 local function prompt()
-   local s = '[Lua # ' .. counter .. '] > '
+   local s = '> '
    return s
 end
 
@@ -382,10 +382,8 @@ function repl()
 
       -- Last result:
       _LAST = _RESULTS[#_RESULTS]
-      if not _ then _ = _LAST end
    end
 end
 
--- Start REPL!
-repl()
-
+-- return repl, just call it to start it!
+return repl

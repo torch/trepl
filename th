@@ -1,0 +1,67 @@
+#!/usr/bin/env torch-lua
+
+-- help
+local help = [==[
+Usage: th [options] [script.lua [arguments]]
+
+Options:
+  -lname             load library name
+  -h,--help          print this help
+  -i,--interactive   enter the REPL after executing a script ]==]
+
+-- parse arguments
+local run,interactive,progargs
+for _,arg in ipairs(arg) do
+   -- load libraries
+   local _,_,lib = arg:find('^%-l(.*)')
+   if lib then
+      local ok = pcall(require,lib)
+      if not ok then
+         print('could not load ' .. lib .. ', skipping')
+      end
+   elseif progargs then
+      -- program args
+      table.insert(progargs,arg)
+   else
+      -- option?
+      local _,_,option = arg:find('^%-%-(.*)')
+      local shortopt
+      if not option then
+         _,_,shortopt = arg:find('^%-(.*)')
+      end
+      if option or shortopt then
+         -- help
+         if shortopt == 'h' or option == 'help' then
+            print(help)
+            os.exit()
+         elseif shortopt == 'i' or option == 'interactive' then
+            interactive = true
+         else
+            -- unknown
+            print('Error: unrecognized flag --' .. option)
+            print(help)
+            os.exit()
+         end
+      else
+         -- exec program
+         run = arg
+         progargs = {}
+      end
+   end
+end
+
+-- load repl
+local repl = require 'trepl'
+
+-- run program
+if run then
+   -- set prog args:
+   arg = progargs
+   -- run
+   dofile(run)
+   -- quit by default
+   if not interactive then os.exit() end
+end
+
+-- start repl
+repl()
