@@ -2,7 +2,7 @@ package = "trepl"
 version = "scm-1"
 
 source = {
-   url = "git://github.com/clementfarabet/trepl",
+   url = "git://github.com/torch/trepl",
    branch = "master",
 }
 
@@ -11,7 +11,7 @@ description = {
    detailed = [[
 An embedabble, Lua-only REPL for Torch.
    ]],
-   homepage = "https://github.com/clementfarabet/trepl",
+   homepage = "https://github.com/torch/trepl",
    license = "BSD"
 }
 
