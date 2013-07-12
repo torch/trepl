@@ -16,6 +16,8 @@ Features:
 * No need for '=' to print
 * Easy help with: ? funcname
 * Shell commands with: $ cmd (example: $ ls)
+* Print all user globals with who()
+* Import a package's symbols globally with import(package)
 
 Install
 -------
