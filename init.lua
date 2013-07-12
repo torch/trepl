@@ -215,6 +215,26 @@ function print(...)
    end
 end
 
+-- Import, ala Python
+function import(package, forced)
+   local ret = require(package)
+   local symbols = {}
+   if _G[package] then
+      _G._torchimport = _G._torchimport or {}
+      _G._torchimport[package] = _G[package]
+      symbols = _G[package]
+   elseif ret and type(ret) == 'table' then
+      _G._torchimport = _G._torchimport or {}
+      _G._torchimport[package] = ret
+      symbols = ret
+   end
+   for k,v in pairs(symbols) do
+      if not _G[k] or forced then
+         _G[k] = v
+      end
+   end
+end
+
 -- Tracekback (error printout)
 local function traceback(message)
    local tp = type(message)
