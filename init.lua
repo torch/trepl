@@ -235,6 +235,28 @@ function import(package, forced)
    end
 end
 
+-- Who
+-- a simple function that prints all the symbols defined by the user
+-- very much like Matlab's who function
+function who(system)
+   local m = getmaxlen(_G)
+   local p = _G._preloaded_
+   local function printsymb(sys)
+      for k,v in pairs(_G) do
+         if (sys and p[k]) or (not sys and not p[k]) then
+            print(printvar(k,_G[k],m))
+         end
+      end
+   end
+   if system then
+      print('== System Variables ==')
+      printsymb(true)
+   end
+   print('== User Variables ==')
+   printsymb(false)
+   print('==')
+end
+
 -- Tracekback (error printout)
 local function traceback(message)
    local tp = type(message)
@@ -449,6 +471,12 @@ function repl()
       -- Last result:
       _LAST = _RESULTS[#_RESULTS]
    end
+end
+
+-- Store preloaded symbols, for who()
+_G._preloaded_ = {}
+for k,v in pairs(_G) do
+   _G._preloaded_[k] = true
 end
 
 -- return repl, just call it to start it!
