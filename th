@@ -5,16 +5,28 @@ local help = [==[
 Usage: th [options] [script.lua [arguments]]
 
 Options:
-  -lname             load library name
+  -l name            load library name
+  -e statement       execute statement
   -h,--help          print this help
   -i,--interactive   enter the REPL after executing a script ]==]
 
 -- parse arguments
-local run,interactive,progargs
+local run,interactive,progargs,statement,lib,_
 local parg = arg
+local nextarg
 for _,arg in ipairs(parg) do
+   -- nextarg set?
+   if nextarg == 'exec' then
+      statement = arg
+      nextarg = nil
+   elseif nextarg == 'lib' then
+      lib = arg
+      nextarg = nil
+   else
+       _,_,lib = arg:find('^%-l(.*)')
+       if lib == '' then lib = nil end
+   end
    -- load libraries
-   local _,_,lib = arg:find('^%-l(.*)')
    if lib then
       local ok = pcall(require,lib)
       if not ok then
@@ -23,7 +35,7 @@ for _,arg in ipairs(parg) do
    elseif progargs then
       -- program args
       table.insert(progargs,arg)
-   else
+   elseif not statement then
       -- option?
       local _,_,option = arg:find('^%-%-(.*)')
       local shortopt
@@ -37,6 +49,10 @@ for _,arg in ipairs(parg) do
             os.exit()
          elseif shortopt == 'i' or option == 'interactive' then
             interactive = true
+         elseif shortopt == 'e' then
+             nextarg = 'exec'
+         elseif shortopt == 'l' then
+             nextarg = 'lib'
          else
             -- unknown
             print('Error: unrecognized flag --' .. option)
@@ -58,6 +74,18 @@ end
 
 -- load repl
 local repl = require 'trepl'
+
+-- statement
+if statement then
+   -- exec statement:
+   local s = loadstring(statement)
+   local ok,res = pcall(s)
+   if not ok then
+      print('could not execute statement, skipping')
+   end
+   -- quit by default
+   if not interactive then os.exit() end
+end
 
 -- run program
 if run then
