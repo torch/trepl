@@ -17,9 +17,8 @@
    Clement Farabet, 2013
 --]============================================================================]
 
--- Try to load env: Torch, dok (for help function), and penlight for completion helpers:
+-- Try to load env: Torch and penlight for completion helpers:
 pcall(require,'torch')
-pcall(require,'dok')
 pcall(require,'pl')
 
 -- Colors:
@@ -446,7 +445,13 @@ function repl()
       
       -- Shortcut to get help:
       if line and line:find('^%s-?') then
-         line = 'help(' .. line:gsub('^%s-?','') .. ')'
+         local ok = pcall(require,'dok')
+         if ok then
+            line = 'help(' .. line:gsub('^%s-?','') .. ')'
+         else
+            print('error: could not load help backend')
+            line = nil
+         end
       end
 
       -- EVAL:
