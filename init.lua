@@ -17,6 +17,9 @@
    Clement Farabet, 2013
 --]============================================================================]
 
+-- Require Torch
+pcall(require,'torch')
+
 -- Colors:
 local colors = {
    none = '\27[0m',
@@ -383,7 +386,6 @@ local aliases = [[
 -- The REPL:
 function repl()
    -- Timer
-   pcall(require,'torch')
    local timer_start, timer_stop
    if torch and torch.Timer then
       local t = torch.Timer()
