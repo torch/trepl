@@ -17,10 +17,6 @@
    Clement Farabet, 2013
 --]============================================================================]
 
--- Try to load env: Torch and penlight for completion helpers:
-pcall(require,'torch')
-pcall(require,'pl')
-
 -- Colors:
 local colors = {
    none = '\27[0m',
@@ -280,7 +276,8 @@ local function readline()
    return io.read('*line')
 end
 
--- LineNoise?
+-- Penlight + LineNoise?
+pcall(require,'pl')
 local ok,L = pcall(require,'linenoise')
 if ok then
    -- History:
@@ -383,26 +380,27 @@ local aliases = [[
    alias lla='ls -lahF';
 ]]
 
--- Timer
-local timer_start, timer_stop
-if torch and torch.Timer then
-   local t = torch.Timer()
-   local start = 0
-   timer_start = function()
-      start = t:time().real
-   end
-   timer_stop = function()
-      local step = t:time().real - start
-      for i = 1,70 do io.write(' ') end
-      print(c('Black',string.format('[%0.04fs]', step)))
-   end
-else
-   timer_start = function() end
-   timer_stop = function() end
-end
-
 -- The REPL:
 function repl()
+   -- Timer
+   pcall(require,'torch')
+   local timer_start, timer_stop
+   if torch and torch.Timer then
+      local t = torch.Timer()
+      local start = 0
+      timer_start = function()
+         start = t:time().real
+      end
+      timer_stop = function()
+         local step = t:time().real - start
+         for i = 1,70 do io.write(' ') end
+         print(c('Black',string.format('[%0.04fs]', step)))
+      end
+   else
+      timer_start = function() end
+      timer_stop = function() end
+   end
+
    -- Reults:
    _RESULTS = {}
 
