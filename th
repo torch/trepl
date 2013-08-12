@@ -103,7 +103,7 @@ end
 -- start repl
 if async then
    -- BETA: async repl
-   local async = require 'async'
+   async = require 'async'
    async.repl()
    async.go()
 else
