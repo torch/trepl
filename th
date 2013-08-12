@@ -8,10 +8,11 @@ Options:
   -l name            load library name
   -e statement       execute statement
   -h,--help          print this help
+  -a,--async         preload async (libuv) and start async repl (BETA)
   -i,--interactive   enter the REPL after executing a script ]==]
 
 -- parse arguments
-local run,interactive,progargs,statement,lib,_
+local async,run,interactive,progargs,statement,lib,_
 local parg = arg
 local nextarg
 for _,arg in ipairs(parg) do
@@ -50,9 +51,11 @@ for _,arg in ipairs(parg) do
          elseif shortopt == 'i' or option == 'interactive' then
             interactive = true
          elseif shortopt == 'e' then
-             nextarg = 'exec'
+            nextarg = 'exec'
+         elseif shortopt == 'a' or option == 'async' then
+            async = true
          elseif shortopt == 'l' then
-             nextarg = 'lib'
+            nextarg = 'lib'
          else
             -- unknown
             print('Error: unrecognized flag --' .. option)
@@ -98,4 +101,12 @@ if run then
 end
 
 -- start repl
-repl()
+if async then
+   -- BETA: async repl
+   local async = require 'async'
+   async.repl()
+   async.go()
+else
+   -- regular repl
+   repl()
+end
