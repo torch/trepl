@@ -54,6 +54,7 @@ for _,arg in ipairs(parg) do
             nextarg = 'exec'
          elseif shortopt == 'a' or option == 'async' then
             async = true
+            interactive = true
          elseif shortopt == 'l' then
             nextarg = 'lib'
          else
