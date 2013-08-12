@@ -55,6 +55,7 @@ for _,arg in ipairs(parg) do
          elseif shortopt == 'a' or option == 'async' then
             asyncrepl = true
             interactive = true
+            async = require 'async'
          elseif shortopt == 'l' then
             nextarg = 'lib'
          else
@@ -104,7 +105,6 @@ end
 -- start repl
 if asyncrepl then
    -- BETA: async repl
-   async = require 'async'
    async.repl()
    async.go()
 else
