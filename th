@@ -12,7 +12,7 @@ Options:
   -i,--interactive   enter the REPL after executing a script ]==]
 
 -- parse arguments
-local async,run,interactive,progargs,statement,lib,_
+local asyncrepl,run,interactive,progargs,statement,lib,_
 local parg = arg
 local nextarg
 for _,arg in ipairs(parg) do
@@ -53,7 +53,7 @@ for _,arg in ipairs(parg) do
          elseif shortopt == 'e' then
             nextarg = 'exec'
          elseif shortopt == 'a' or option == 'async' then
-            async = true
+            asyncrepl = true
             interactive = true
          elseif shortopt == 'l' then
             nextarg = 'lib'
@@ -102,7 +102,7 @@ if run then
 end
 
 -- start repl
-if async then
+if asyncrepl then
    -- BETA: async repl
    async = require 'async'
    async.repl()
