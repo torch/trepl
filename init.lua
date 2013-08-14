@@ -255,6 +255,27 @@ function who(system)
    print('==')
 end
 
+-- Monitor Globals
+function monitor_G(cb)
+   local evercreated = {}
+   for k in pairs(_G) do
+      evercreated[k] = true
+   end
+   setmetatable(_G, {
+      __newindex = function(_,key,val)
+         if not evercreated[key] then 
+            if cb then
+               cb(key)
+            else
+               print('created a global variable: ' .. key)
+            end
+         end
+         evercreated[key] = true
+         rawset(_G,key,val)
+      end
+   })
+end
+
 -- Tracekback (error printout)
 local function traceback(message)
    local tp = type(message)
@@ -405,6 +426,7 @@ function repl()
 
    -- Reults:
    _RESULTS = {}
+   _LAST = ''
 
    -- REPL:
    while true do
