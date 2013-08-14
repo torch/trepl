@@ -9,10 +9,11 @@ Options:
   -e statement       execute statement
   -h,--help          print this help
   -a,--async         preload async (libuv) and start async repl (BETA)
+  -g,--globals       monitor global variables (print a warning on creation)
   -i,--interactive   enter the REPL after executing a script ]==]
 
 -- parse arguments
-local asyncrepl,run,interactive,progargs,statement,lib,_
+local asyncrepl,run,interactive,progargs,statement,lib,globs,_
 local parg = arg
 local nextarg
 for _,arg in ipairs(parg) do
@@ -56,6 +57,8 @@ for _,arg in ipairs(parg) do
             asyncrepl = true
             interactive = true
             async = require 'async'
+         elseif shortopt == 'g' or option == 'globals' then
+            globs = true
          elseif shortopt == 'l' then
             nextarg = 'lib'
          else
@@ -79,6 +82,11 @@ end
 
 -- load repl
 local repl = require 'trepl'
+
+-- monitor globals
+if globs then
+   monitor_G()
+end
 
 -- statement
 if statement then
