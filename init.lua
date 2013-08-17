@@ -290,7 +290,7 @@ end
 -- Prompt:
 local counter = 1
 local function prompt()
-   local s = '> '
+   local s = _PROMPT or '> '
    return s
 end
 
