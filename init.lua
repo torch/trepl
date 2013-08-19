@@ -173,10 +173,13 @@ end
 
 -- This is a new recursive, colored print.
 function print(...)
+   local function rawprint(o)
+      io.write(tostring(o or '') .. '\n')
+   end
    local objs = {...}
    local function printrecursive(obj,tab)
       local tab = tab or 0
-      local line = function(s) for i=1,tab do io.write(' ') end print_old(s) end
+      local line = function(s) for i=1,tab do io.write(' ') end rawprint(s) end
       line('{')
       tab = tab+2
       for k,v in pairs(obj) do
@@ -197,15 +200,15 @@ function print(...)
       local obj = select(i,...)
       if type(obj) ~= 'table' then
          if type(obj) == 'userdata' or type(obj) == 'cdata' then
-            print_old(obj)
+            rawprint(obj)
          else
             io.write(colorize(obj) .. '\t')
             if i == select('#',...) then
-               print_old()
+               rawprint()
             end
          end
       elseif getmetatable(obj) and getmetatable(obj).__tostring then
-         print_old(obj)
+         rawprint(obj)
          printrecursive(obj)
       else
          printrecursive(obj) 
