@@ -175,6 +175,7 @@ end
 function print(...)
    local function rawprint(o)
       io.write(tostring(o or '') .. '\n')
+      io.flush()
    end
    local objs = {...}
    local function printrecursive(obj,tab)
