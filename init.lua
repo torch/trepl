@@ -147,7 +147,7 @@ local function colorize(object)
    elseif type(object) == 'boolean' then
       return apply('blue', tostring(object))
    elseif type(object) == 'string' then
-      return apply('yellow', object)
+      return apply('none', object)
    elseif type(object) == 'function' then
       return apply('magenta', tostring(object))
    elseif type(object) == 'userdata' or type(object) == 'cdata' then
@@ -167,7 +167,7 @@ local function colorize(object)
    elseif type(object) == 'table' then
       return apply('green', tostring(object))
    else
-      return apply('black', tostring(object))
+      return apply('_black', tostring(object))
    end
 end
 
