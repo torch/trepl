@@ -135,7 +135,7 @@ if not print_old then
 end
 
 -- a function to colorize output:
-local function colorize(object)
+local function colorize(object,nested)
    -- Apply:
    local apply = c
    
@@ -147,7 +147,11 @@ local function colorize(object)
    elseif type(object) == 'boolean' then
       return apply('blue', tostring(object))
    elseif type(object) == 'string' then
-      return apply('none', object)
+      if nested then
+         return apply('Black','"')..apply('green', object)..apply('Black','"')
+      else
+         return apply('none', object)
+      end
    elseif type(object) == 'function' then
       return apply('magenta', tostring(object))
    elseif type(object) == 'userdata' or type(object) == 'cdata' then
@@ -186,12 +190,12 @@ function print(...)
       for k,v in pairs(obj) do
          if type(v) == 'table' then
             if tab > 16 or next(v) == nil then
-               line(k .. ' : ' .. colorize(v))
+               line(k .. ' : ' .. colorize(v,true))
             else
                line(k .. ' : ') printrecursive(v,tab+4)
             end
          else
-            line(k .. ' : ' .. colorize(v))
+            line(k .. ' : ' .. colorize(v,true))
          end
       end
       tab = tab-2
