@@ -241,6 +241,26 @@ function import(package, forced)
    end
 end
 
+-- Smarter require (ala Node.js)
+local drequire = require
+function require(name)
+   if name:find('^%.') then
+      local file = debug.getinfo(2).source:gsub('^@','')
+      local dir = path.dirname(file)
+      local pkgpath = path.join(dir,name)
+      if path.isfile(pkgpath..'.lua') then
+         return dofile(pkgpath..'.lua')
+      elseif path.isfile(pkgpath) then
+         return dofile(pkgpath)
+      else
+         local initpath = path.join(pkgpath,'init.lua')
+         return dofile(initpath)
+      end
+   else
+      return drequire(name)
+   end
+end
+
 -- Who
 -- a simple function that prints all the symbols defined by the user
 -- very much like Matlab's who function
