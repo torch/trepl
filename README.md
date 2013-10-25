@@ -14,10 +14,11 @@ Features:
 * Auto-print after eval (can be stopped with ;)
 * Each command is profiled, timing is reported
 * No need for '=' to print
-* Easy help with: ? funcname
-* Shell commands with: $ cmd (example: $ ls)
-* Print all user globals with who()
-* Import a package's symbols globally with import(package)
+* Easy help with: `? funcname`
+* Shell commands with: $ cmd (example: `$ ls`)
+* Print all user globals with `who()`
+* Import a package's symbols globally with `import(package)`
+* Require is overloaded to provide relative search paths: `require('./mylocallib/')`
 
 Install
 -------
