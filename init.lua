@@ -214,7 +214,7 @@ function print(...)
          end
       elseif getmetatable(obj) and getmetatable(obj).__tostring then
          rawprint(obj)
-         printrecursive(obj)
+         --printrecursive(obj)
       else
          printrecursive(obj) 
       end
