@@ -1,5 +1,3 @@
-#!/usr/bin/env torch-lua
-
 -- help
 local help = [==[
 Usage: th [options] [script.lua [arguments]]
