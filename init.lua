@@ -246,7 +246,10 @@ local drequire = require
 function require(name)
    if name:find('^%.') then
       local file = debug.getinfo(2).source:gsub('^@','')
-      local dir = path.dirname(file)
+      local dir = '.'
+      if path.exists(file) then
+         dir = path.dirname(file)
+      end
       local pkgpath = path.join(dir,name)
       if path.isfile(pkgpath..'.lua') then
          return dofile(pkgpath..'.lua')
