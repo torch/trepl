@@ -1,3 +1,5 @@
+#!/usr/bin/env luajit
+
 -- help
 local help = [==[
 Usage: th [options] [script.lua [arguments]]
