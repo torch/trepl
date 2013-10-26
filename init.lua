@@ -293,7 +293,7 @@ function monitor_G(cb)
       evercreated[k] = true
    end
    setmetatable(_G, {
-      __newindex = function(_,key,val)
+      __newindex = function(G,key,val)
          if not evercreated[key] then 
             if cb then
                cb(key)
@@ -302,7 +302,7 @@ function monitor_G(cb)
             end
          end
          evercreated[key] = true
-         rawset(_G,key,val)
+         rawset(G,key,val)
       end
    })
 end
@@ -473,13 +473,13 @@ function repl_readline()
 end
 
 -- No readline -> LineNoise?
-local readline
+local nextline
 if not readline_ok then
    -- Load linenoise:
    local ok,L = pcall(require,'linenoise')
    if not ok then
       -- No readline, no linenoise... default to plain io:
-      readline = function()
+      nextline = function()
          io.write(prompt()) io.flush()
          return io.read('*line')
       end
@@ -537,7 +537,7 @@ if not readline_ok then
       end)
 
       -- read line:
-      readline = function()
+      nextline = function()
          -- Get line:
          local line = L.linenoise(prompt())
 
@@ -576,7 +576,7 @@ function repl_linenoise()
    -- REPL:
    while true do
       -- READ:
-      local line = readline()
+      local line = nextline()
 
       -- Interupt?
       if not line or line == 'exit' then
