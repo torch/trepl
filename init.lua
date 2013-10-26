@@ -316,7 +316,6 @@ local function traceback(message)
 end
 
 -- Prompt:
-local counter = 1
 local function prompt()
    local s = _PROMPT or '> '
    return s
@@ -328,102 +327,6 @@ local function readline()
    return io.read('*line')
 end
 
--- Penlight + LineNoise?
-pcall(require,'pl')
-local ok,L = pcall(require,'linenoise')
-if ok then
-   -- History:
-   local history = os.getenv('HOME') .. '/.luahistory'
-   L.historyload(history)
-
-   -- Completion:
-   L.setcompletion(function(c,s)
-      -- Check if we're in a string
-      local ignore,str = s:gfind('(.-)"([a-zA-Z%._]*)$')()
-      local quote = '"'
-      if not str then
-         ignore,str = s:gfind('(.-)\'([a-zA-Z%._]*)$')()
-         quote = "'"
-      end
-
-      -- String?
-      if str then
-         -- Is it a require?
-         if ignore:find('^%s-require%s-%(%s-$') or ignore:find('^%s-require%s-$') then
-            local paths = stringx.split(package.path,';')
-            for _,path in ipairs(paths) do
-               local p = path:gsub('%?',str..'*')
-               local f = io.popen('ls '.. p ..' 2> /dev/null')
-               local res = f:read('*all')
-               f:close()
-               res = res:gsub('(%s*)$','')
-               local elts = stringx.split(res,'\n')
-               for _,elt in ipairs(elts) do
-                  if not elt:find('ls: ') then
-                     local parts = stringx.split(elt,'/')
-                     if parts[#parts] == 'init.lua' then
-                        L.addcompletion(c,ignore .. quote .. parts[#parts-1])
-                     elseif parts[#parts]:find('%.lua$') then
-                        L.addcompletion(c,ignore .. quote .. parts[#parts]:gsub('%.lua$',''))
-                     end
-                  end
-               end
-            end
-            return
-         end
-
-         -- Complete from disk:
-         local f = io.popen('ls ' .. str..'* 2> /dev/null')
-         local res = f:read('*all')
-         f:close()
-         res = res:gsub('(%s*)$','')
-         local elts = stringx.split(res,'\n')
-         for _,elt in ipairs(elts) do
-            L.addcompletion(c,ignore .. quote .. elt)
-         end
-         return
-      end
-
-      -- Get symbol of interest
-      local ignore,str = s:gfind('(.-)([a-zA-Z%._]*)$')()
-
-      -- Lookup globals:
-      if not str:find('%.') then
-         for k,v in pairs(_G) do
-            if k:find('^'..str) then
-               L.addcompletion(c,ignore .. k)
-            end
-         end
-      end
-
-      -- Lookup packages:
-      local base,sub = str:gfind('(.*)%.(.*)')()
-      if base then
-         local ok,res = pcall(loadstring('return ' .. base))
-         for k,v in pairs(res) do
-            if k:find('^'..sub) then
-               L.addcompletion(c,ignore .. base .. '.' .. k)
-            end
-         end
-      end
-   end)
-
-   -- read line:
-   readline = function()
-      -- Get line:
-      local line = L.linenoise(prompt())
-
-      -- Save:
-      if line and not line:find('^%s-$') then
-         L.historyadd(line)
-         L.historysave(history)
-      end
-
-      -- Return line:
-      return line
-   end
-end
-
 -- Aliases:
 local aliases = [[
    alias ls='ls -GF';
@@ -432,8 +335,235 @@ local aliases = [[
    alias lla='ls -lahF';
 ]]
 
--- The REPL:
-function repl()
+-- Penlight
+pcall(require,'pl')
+
+-- Readline:
+local readline_ok,readline = pcall(require,"trepl.readline")
+
+-- REPL:
+function repl_readline()
+   -- Completer:
+   local completer = require 'trepl.completer'
+   completer.final_char_setter = readline.completion_append_character
+
+   -- Timer
+   local timer_start, timer_stop
+   if torch and torch.Timer then
+      local t = torch.Timer()
+      local start = 0
+      timer_start = function()
+         start = t:time().real
+      end
+      timer_stop = function()
+         local step = t:time().real - start
+         for i = 1,70 do io.write(' ') end
+         print(c('Black',string.format('[%0.04fs]', step)))
+      end
+   else
+      timer_start = function() end
+      timer_stop = function() end
+   end
+
+   -- Reults:
+   _RESULTS = {}
+   _LAST = ''
+   
+   -- History:
+   local history = os.getenv('HOME') .. '/.luahistory'
+
+   -- Readline callback:
+   readline.shell{
+      history = history,
+      getcommand = function()
+         -- get the first line
+         local line = coroutine.yield('> ')
+         local cmd = line .. '\n'
+
+         -- = (lua supports that)
+         if cmd:sub(1,1) == "=" then
+            cmd = "return "..cmd:sub(2)
+         end
+      
+         -- Interupt?
+         if line == 'exit' then
+            io.stdout:write('Do you really want to exit ([y]/n)? ') io.flush()
+            local line = io.read('*l')
+            if line == '' or line:lower() == 'y' then
+               os.exit()
+            end
+         end
+      
+         -- OS Commands:
+         if line and line:find('^%s-%$') then
+            line = line:gsub('^%s-%$','')
+            if io.popen then
+               local f = io.popen(aliases .. ' ' .. line)
+               local res = f:read('*a')
+               f:close()
+               io.write(c('_black',res)) io.flush()
+               table.insert(_RESULTS, res)
+               _LAST = _RESULTS[#_RESULTS]
+            else
+               os.execute(aliases .. ' ' .. line)
+            end
+            timer_stop()
+            return line 
+         end
+         
+         -- Shortcut to get help:
+         if line and line:find('^%s-?') then
+            local ok = pcall(require,'dok')
+            if ok then
+               line = 'help(' .. line:gsub('^%s-?','') .. ')'
+            else
+               print('error: could not load help backend')
+               return line
+            end
+         end
+
+         -- try to return first:
+         timer_start()
+         local ok,err
+         if line:find(';%s-$') or line:find('^%s-print') then
+            ok = false
+         else
+            ok,err = xpcall(loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])'), traceback)
+         end
+         if ok then 
+            _LAST = _RESULTS[#_RESULTS]
+            timer_stop()
+            return line 
+         end
+
+         -- continue to get lines until get a complete chunk
+         local func, err
+         while true do
+            -- if not go ahead:
+            func, err = loadstring(cmd)
+            if func or err:sub(-7) ~= "'<eof>'" then break end
+
+            -- concat:
+            cmd = cmd .. coroutine.yield('>> ') .. "\n"
+         end
+
+         -- exec chunk:
+         if not cmd:match("^%s*$") then
+            local ok,err = xpcall(loadstring(cmd), traceback)
+            if not ok then
+               print(err)
+            end
+            timer_stop()
+            return cmd:sub(1, -2) -- remove last \n for history
+         end
+      end,
+
+      complete = completer.complete,
+      word_break_characters = " \t\n\"\\'><=;:+-*/%^~#{}()[].,",
+   }
+   io.stderr:write"\n"
+end
+
+-- No readline -> LineNoise?
+if not readline_ok then
+   -- Load linenoise:
+   local ok,L = pcall(require,'linenoise')
+   if ok then
+      -- History:
+      local history = os.getenv('HOME') .. '/.luahistory'
+      L.historyload(history)
+
+      -- Completion:
+      L.setcompletion(function(c,s)
+         -- Check if we're in a string
+         local ignore,str = s:gfind('(.-)"([a-zA-Z%._]*)$')()
+         local quote = '"'
+         if not str then
+            ignore,str = s:gfind('(.-)\'([a-zA-Z%._]*)$')()
+            quote = "'"
+         end
+
+         -- String?
+         if str then
+            -- Is it a require?
+            if ignore:find('^%s-require%s-%(%s-$') or ignore:find('^%s-require%s-$') then
+               local paths = stringx.split(package.path,';')
+               for _,path in ipairs(paths) do
+                  local p = path:gsub('%?',str..'*')
+                  local f = io.popen('ls '.. p ..' 2> /dev/null')
+                  local res = f:read('*all')
+                  f:close()
+                  res = res:gsub('(%s*)$','')
+                  local elts = stringx.split(res,'\n')
+                  for _,elt in ipairs(elts) do
+                     if not elt:find('ls: ') then
+                        local parts = stringx.split(elt,'/')
+                        if parts[#parts] == 'init.lua' then
+                           L.addcompletion(c,ignore .. quote .. parts[#parts-1])
+                        elseif parts[#parts]:find('%.lua$') then
+                           L.addcompletion(c,ignore .. quote .. parts[#parts]:gsub('%.lua$',''))
+                        end
+                     end
+                  end
+               end
+               return
+            end
+
+            -- Complete from disk:
+            local f = io.popen('ls ' .. str..'* 2> /dev/null')
+            local res = f:read('*all')
+            f:close()
+            res = res:gsub('(%s*)$','')
+            local elts = stringx.split(res,'\n')
+            for _,elt in ipairs(elts) do
+               L.addcompletion(c,ignore .. quote .. elt)
+            end
+            return
+         end
+
+         -- Get symbol of interest
+         local ignore,str = s:gfind('(.-)([a-zA-Z%._]*)$')()
+
+         -- Lookup globals:
+         if not str:find('%.') then
+            for k,v in pairs(_G) do
+               if k:find('^'..str) then
+                  L.addcompletion(c,ignore .. k)
+               end
+            end
+         end
+
+         -- Lookup packages:
+         local base,sub = str:gfind('(.*)%.(.*)')()
+         if base then
+            local ok,res = pcall(loadstring('return ' .. base))
+            for k,v in pairs(res) do
+               if k:find('^'..sub) then
+                  L.addcompletion(c,ignore .. base .. '.' .. k)
+               end
+            end
+         end
+      end)
+
+      -- read line:
+      readline = function()
+         -- Get line:
+         local line = L.linenoise(prompt())
+
+         -- Save:
+         if line and not line:find('^%s-$') then
+            L.historyadd(line)
+            L.historysave(history)
+         end
+
+         -- Return line:
+         return line
+      end
+   end
+end
+
+-- The linenoise REPL (also works without linenoise...)
+function repl_linenoise()
    -- Timer
    local timer_start, timer_stop
    if torch and torch.Timer then
@@ -519,7 +649,6 @@ function repl()
                print(err)
             end
          end
-         counter = counter + 1
          timer_stop()
       end
 
@@ -535,4 +664,4 @@ for k,v in pairs(_G) do
 end
 
 -- return repl, just call it to start it!
-return repl
+return (readline_ok and repl_readline) or repl_linenoise

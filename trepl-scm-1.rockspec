@@ -25,6 +25,8 @@ build = {
    type = "builtin",
    modules = {
       ['trepl.init'] = 'init.lua',
+      ['trepl.readline'] = 'readline.lua',
+      ['trepl.completer'] = 'completer.lua',
    },
    install = {
       bin = {

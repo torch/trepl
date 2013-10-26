@@ -1,8 +1,17 @@
-TREPL: A REPL for Torch
-=======================
+TREPL: A REPL for Torch/LuaJIT
+==============================
 
-A pure Lua REPL for Torch. Uses [Linenoise](https://github.com/hoelzro/lua-linenoise) 
-for completion/history. Installs a new binary named "th".
+A pure Lua REPL for LuaJIT, with heavy support for Torch types. 
+
+Uses Readline for tab completion, with code borrowed from
+[iluajit](https://github.com/jdesgats/ILuaJIT).
+
+If Readline is not found, it defaults to using
+[Linenoise](https://github.com/hoelzro/lua-linenoise),
+which is significantly more simplistic.
+
+This package installs a new binary named "th", which
+comes packed with all these features:
 
 Features:
 
@@ -26,7 +35,7 @@ Install
 Via torch-rocks:
 
 ```
-torch-rocks install trepl
+luarocks install trepl
 ```
 
 Launch
@@ -43,7 +52,7 @@ Alternatively, you can always bring up the repl by loading it as a lib,
 from anywhere:
 
 ```
-torch
+luajit
 > repl = require 'trepl'
 > repl()
 ```
