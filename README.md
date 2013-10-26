@@ -10,7 +10,7 @@ If Readline is not found, it defaults to using
 [Linenoise](https://github.com/hoelzro/lua-linenoise),
 which is significantly more simplistic.
 
-This package installs a new binary named "th", which
+This package installs a new binary named `th`, which
 comes packed with all these features:
 
 Features:
