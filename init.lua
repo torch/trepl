@@ -491,30 +491,6 @@ if not readline_ok then
 
          -- String?
          if str then
-            -- Is it a require?
-            if ignore:find('^%s-require%s-%(%s-$') or ignore:find('^%s-require%s-$') then
-               local paths = stringx.split(package.path,';')
-               for _,path in ipairs(paths) do
-                  local p = path:gsub('%?',str..'*')
-                  local f = io.popen('ls '.. p ..' 2> /dev/null')
-                  local res = f:read('*all')
-                  f:close()
-                  res = res:gsub('(%s*)$','')
-                  local elts = stringx.split(res,'\n')
-                  for _,elt in ipairs(elts) do
-                     if not elt:find('ls: ') then
-                        local parts = stringx.split(elt,'/')
-                        if parts[#parts] == 'init.lua' then
-                           L.addcompletion(c,ignore .. quote .. parts[#parts-1])
-                        elseif parts[#parts]:find('%.lua$') then
-                           L.addcompletion(c,ignore .. quote .. parts[#parts]:gsub('%.lua$',''))
-                        end
-                     end
-                  end
-               end
-               return
-            end
-
             -- Complete from disk:
             local f = io.popen('ls ' .. str..'* 2> /dev/null')
             local res = f:read('*all')
