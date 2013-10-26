@@ -340,6 +340,10 @@ local aliases = [[
 -- Penlight
 pcall(require,'pl')
 
+-- Reults:
+_RESULTS = {}
+_LAST = ''
+
 -- Readline:
 local readline_ok,readline = pcall(require,"trepl.readline")
 
@@ -366,10 +370,6 @@ function repl_readline()
       timer_start = function() end
       timer_stop = function() end
    end
-
-   -- Reults:
-   _RESULTS = {}
-   _LAST = ''
    
    -- History:
    local history = os.getenv('HOME') .. '/.luahistory'
@@ -566,10 +566,6 @@ function repl_linenoise()
       timer_start = function() end
       timer_stop = function() end
    end
-
-   -- Reults:
-   _RESULTS = {}
-   _LAST = ''
 
    -- REPL:
    while true do
