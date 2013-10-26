@@ -316,15 +316,14 @@ local function traceback(message)
 end
 
 -- Prompt:
-local function prompt()
-   local s = _PROMPT or '> '
+local function prompt(aux)
+   local s
+   if not aux then
+      s = '> '
+   else
+      s = '>> '
+   end
    return s
-end
-
--- Read line:
-local function readline()
-   io.write(prompt()) io.flush()
-   return io.read('*line')
 end
 
 -- Aliases:
@@ -377,7 +376,7 @@ function repl_readline()
       history = history,
       getcommand = function()
          -- get the first line
-         local line = coroutine.yield('> ')
+         local line = coroutine.yield(prompt())
          local cmd = line .. '\n'
 
          -- = (lua supports that)
@@ -444,7 +443,7 @@ function repl_readline()
             if func or err:sub(-7) ~= "'<eof>'" then break end
 
             -- concat:
-            cmd = cmd .. coroutine.yield('>> ') .. "\n"
+            cmd = cmd .. coroutine.yield(prompt(true)) .. '\n'
          end
 
          -- exec chunk:
@@ -465,10 +464,17 @@ function repl_readline()
 end
 
 -- No readline -> LineNoise?
+local readline
 if not readline_ok then
    -- Load linenoise:
    local ok,L = pcall(require,'linenoise')
-   if ok then
+   if not ok then
+      -- No readline, no linenoise... default to plain io:
+      readline = function()
+         io.write(prompt()) io.flush()
+         return io.read('*line')
+      end
+   else
       -- History:
       local history = os.getenv('HOME') .. '/.luahistory'
       L.historyload(history)
@@ -562,7 +568,7 @@ if not readline_ok then
    end
 end
 
--- The linenoise REPL (also works without linenoise...)
+-- The default repl
 function repl_linenoise()
    -- Timer
    local timer_start, timer_stop
