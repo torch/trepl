@@ -16,15 +16,18 @@ An embedabble, Lua-only REPL for Torch.
 }
 
 dependencies = {
-   "torch >= 7.1.alpha",
+   "torch >= 7.0",
    "linenoise >= 0.4",
-   "penlight >= 1.1.0"
+   "penlight >= 1.1.0",
+   "luafilesystem >= 1.6.2"
 }
 
 build = {
    type = "builtin",
    modules = {
       ['trepl.init'] = 'init.lua',
+      ['trepl.readline'] = 'readline.lua',
+      ['trepl.completer'] = 'completer.lua',
    },
    install = {
       bin = {
