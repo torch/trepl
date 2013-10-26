@@ -32,7 +32,7 @@ Features:
 Install
 -------
 
-Via torch-rocks:
+Via luarocks:
 
 ```
 luarocks install trepl
