@@ -376,7 +376,16 @@ function repl_readline()
 
    -- Readline callback:
    readline.shell{
+      -- History:
       history = history,
+
+      -- Completer:
+      complete = completer.complete,
+
+      -- Chars:
+      word_break_characters = " \t\n\"\\'><=;:+-*/%^~#{}()[].,",
+
+      -- Get command:
       getcommand = function()
          -- get the first line
          local line = coroutine.yield(prompt())
@@ -459,9 +468,6 @@ function repl_readline()
             return cmd:sub(1, -2) -- remove last \n for history
          end
       end,
-
-      complete = completer.complete,
-      word_break_characters = " \t\n\"\\'><=;:+-*/%^~#{}()[].,",
    }
    io.stderr:write"\n"
 end

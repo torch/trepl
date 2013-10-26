@@ -17,6 +17,8 @@ void add_history(const char *line);
 int read_history(const char *filename);
 int write_history(const char *filename);
 
+void rl_set_signals(void);
+
 /* completion */
 typedef char **rl_completion_func_t (const char *, int, int);
 typedef char *rl_compentry_func_t (const char *, int);
@@ -35,6 +37,8 @@ local libreadline = ffi.load("readline")
 function readline.completion_append_character(char)
    libreadline.rl_completion_append_character = #char > 0 and char:byte(1,1) or 0
 end
+
+libreadline.rl_set_signals()
 
 function readline.shell(config)
    -- restore history
