@@ -332,7 +332,7 @@ local function traceback(message)
    if type(debug) ~= "table" then return message end
    local tb = debug.traceback
    if type(tb) ~= "function" then return message end
-   return tb(message, 2)
+   return tb(message)
 end
 
 -- Prompt:
