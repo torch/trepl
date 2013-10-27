@@ -424,19 +424,19 @@ function repl_readline()
       
          -- OS Commands:
          if line and line:find('^%s-%$') then
-            line = line:gsub('^%s-%$','')
+            local cline = line:gsub('^%s-%$','')
             if io.popen then
-               local f = io.popen(aliases .. ' ' .. line)
+               local f = io.popen(aliases .. ' ' .. cline)
                local res = f:read('*a')
                f:close()
-               io.write(c('_black',res)) io.flush()
+               io.write(c('none',res)) io.flush()
                table.insert(_RESULTS, res)
                _LAST = _RESULTS[#_RESULTS]
             else
-               os.execute(aliases .. ' ' .. line)
+               os.execute(aliases .. ' ' .. cline)
             end
             timer_stop()
-            return line 
+            return line
          end
          
          -- Shortcut to get help:
