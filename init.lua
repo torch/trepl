@@ -477,9 +477,16 @@ function repl_readline()
 
          -- exec chunk:
          if not cmd:match("^%s*$") then
-            local ok,err = xpcall(loadstring(cmd), traceback)
+            local ff=loadstring(cmd)
+            local res = {xpcall(ff, traceback)}
+            local ok,err = res[1], res[2]
             if not ok then
                print(err)
+            else
+               if err ~= nil then
+                  table.remove(res,1)
+                  print(unpack(res))
+               end
             end
             timer_stop()
             return cmd:sub(1, -2) -- remove last \n for history
