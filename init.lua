@@ -493,7 +493,11 @@ $endif
 
          -- exec chunk:
          if not cmd:match("^%s*$") then
-            local ff=loadstring(cmd)
+            local ff,err=loadstring(cmd)
+            if not ff then
+               print(err)
+               return cmd:sub(1, -2)
+            end
             local res = {xpcall(ff, traceback)}
             local ok,err = res[1], res[2]
             if not ok then
