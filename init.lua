@@ -176,26 +176,28 @@ local function colorize(object,nested)
 end
 
 -- This is a new recursive, colored print.
-function print(...)
+local ndepth = 4
+function print_new(...)
    local function rawprint(o)
       io.write(tostring(o or '') .. '\n')
       io.flush()
    end
    local objs = {...}
-   local function printrecursive(obj,tab)
-      local tab = tab or 0
+   local function printrecursive(obj,depth)
+      local depth = depth or 0
+      local tab = depth*4
       local line = function(s) for i=1,tab do io.write(' ') end rawprint(s) end
       line('{')
       tab = tab+2
       for k,v in pairs(obj) do
          if type(v) == 'table' then
-            if tab > 16 or next(v) == nil then
-               line(k .. ' : ' .. colorize(v,true))
+            if depth >= (ndepth-1) or next(v) == nil then
+               line(tostring(k) .. ' : ' .. colorize(v,true))
             else
-               line(k .. ' : ') printrecursive(v,tab+4)
+               line(tostring(k) .. ' : ') printrecursive(v,depth+1)
             end
          else
-            line(k .. ' : ' .. colorize(v,true))
+            line(tostring(k) .. ' : ' .. colorize(v,true))
          end
       end
       tab = tab-2
@@ -220,6 +222,21 @@ function print(...)
       end
    end
 end
+
+
+function setprintlevel(n)
+  if n == nil or n < 0 then
+    error('expected number [0,+)')
+  end
+  n = math.floor(n)
+  ndepth = n
+  if ndepth == 0 then
+    print = print_old
+  else
+    print = print_new
+  end
+end
+setprintlevel(5)
 
 -- Import, ala Python
 function import(package, forced)
