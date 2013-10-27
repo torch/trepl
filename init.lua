@@ -471,6 +471,8 @@ $endif
          local ok,err
          if line:find(';%s-$') or line:find('^%s-print') then
             ok = false
+         elseif line:match('^%s*$') then
+            return nil
          else
             ok,err = xpcall(loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])'), traceback)
          end
