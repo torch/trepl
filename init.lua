@@ -19,6 +19,7 @@
 
 -- Require Torch
 pcall(require,'torch')
+pcall(require,'paths')
 
 -- Colors:
 local colors = {
@@ -369,6 +370,21 @@ function repl_readline()
    -- Completer:
    local completer = require 'trepl.completer'
    completer.final_char_setter = readline.completion_append_character
+
+   local inputrc = paths.concat(os.getenv('HOME'),'.inputrc')
+   if not paths.filep(inputrc) then
+      local finputrc = io.open(inputrc,'w')
+      local trepl =
+[[
+$if TREPL
+   # filter up and down arrows using characters typed so far
+   "\e[A":history-search-backward
+   "\e[B":history-search-forward
+$endif
+]]
+      finputrc:write(trepl)
+      finputrc:close()
+   end
 
    -- Timer
    local timer_start, timer_stop

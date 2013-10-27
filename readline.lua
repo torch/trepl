@@ -30,9 +30,13 @@ rl_completion_func_t *rl_attempted_completion_function;
 char *rl_line_buffer;
 int rl_completion_append_character;
 int rl_attempted_completion_over;
+const char *rl_readline_name;
 ]]
 
 local libreadline = ffi.load("readline")
+
+-- enable application specific parsing with inputrc
+libreadline.rl_readline_name = 'TREPL'
 
 function readline.completion_append_character(char)
    libreadline.rl_completion_append_character = #char > 0 and char:byte(1,1) or 0
