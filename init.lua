@@ -19,6 +19,7 @@
 
 -- Require Torch
 pcall(require,'torch')
+pcall(require,'paths')
 
 -- Colors:
 local colors = {
@@ -370,6 +371,21 @@ function repl_readline()
    local completer = require 'trepl.completer'
    completer.final_char_setter = readline.completion_append_character
 
+   local inputrc = paths.concat(os.getenv('HOME'),'.inputrc')
+   if not paths.filep(inputrc) then
+      local finputrc = io.open(inputrc,'w')
+      local trepl =
+[[
+$if TREPL
+   # filter up and down arrows using characters typed so far
+   "\e[A":history-search-backward
+   "\e[B":history-search-forward
+$endif
+]]
+      finputrc:write(trepl)
+      finputrc:close()
+   end
+
    -- Timer
    local timer_start, timer_stop
    if torch and torch.Timer then
@@ -455,6 +471,8 @@ function repl_readline()
          local ok,err
          if line:find(';%s-$') or line:find('^%s-print') then
             ok = false
+         elseif line:match('^%s*$') then
+            return nil
          else
             ok,err = xpcall(loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])'), traceback)
          end
@@ -477,7 +495,11 @@ function repl_readline()
 
          -- exec chunk:
          if not cmd:match("^%s*$") then
-            local ff=loadstring(cmd)
+            local ff,err=loadstring(cmd)
+            if not ff then
+               print(err)
+               return cmd:sub(1, -2)
+            end
             local res = {xpcall(ff, traceback)}
             local ok,err = res[1], res[2]
             if not ok then
