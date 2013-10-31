@@ -38,7 +38,9 @@ function readline.completion_append_character(char)
    libreadline.rl_completion_append_character = #char > 0 and char:byte(1,1) or 0
 end
 
-libreadline.rl_set_signals()
+if jit.os ~= 'OSX' then
+   libreadline.rl_set_signals()
+end
 
 function readline.shell(config)
    -- restore history
