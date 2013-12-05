@@ -43,7 +43,7 @@ function readline.completion_append_character(char)
 end
 
 if jit.os ~= 'OSX' then
-   libreadline.rl_set_signals()
+   --libreadline.rl_set_signals()
 end
 
 function readline.shell(config)
