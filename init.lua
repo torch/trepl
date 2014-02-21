@@ -273,6 +273,10 @@ function require(name)
          return dofile(pkgpath..'.lua')
       elseif path.isfile(pkgpath) then
          return dofile(pkgpath)
+      elseif path.isfile(pkgpath..'.so') then
+         return package.loadlib(pkgpath..'.so', 'luaopen_'..path.basename(name))()
+      elseif path.isfile(pkgpath..'.dylib') then
+         return package.loadlib(pkgpath..'.dylib', 'luaopen_'..path.basename(name))()
       else
          local initpath = path.join(pkgpath,'init.lua')
          return dofile(initpath)
