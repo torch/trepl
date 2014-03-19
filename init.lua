@@ -472,18 +472,30 @@ $endif
 
          -- try to return first:
          timer_start()
-         local ok,err
+         local pok,ok,err
          if line:find(';%s-$') or line:find('^%s-print') then
             ok = false
          elseif line:match('^%s*$') then
             return nil
          else
-            ok,err = xpcall(loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])'), traceback)
+            local func, perr = loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])')
+            if func then
+               pok = true
+               ok,err = xpcall(func, traceback)
+            end
          end
+
+         -- run ok:
          if ok then 
             _LAST = _RESULTS[#_RESULTS]
             timer_stop()
             return line 
+         end
+
+         -- parsed ok, but failed to run (code error):
+         if pok then
+            print(err)
+            return cmd:sub(1, -2)
          end
 
          -- continue to get lines until get a complete chunk

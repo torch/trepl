@@ -95,6 +95,7 @@ if statement then
    local ok,res = pcall(s)
    if not ok then
       print('could not execute statement, skipping')
+      error(res)
    end
    -- quit by default
    if not interactive then os.exit() end
