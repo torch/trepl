@@ -94,8 +94,8 @@ if statement then
    local s = loadstring(statement)
    local ok,res = pcall(s)
    if not ok then
-      print('could not execute statement, skipping')
-      error(res)
+      print(res)
+      os.exit()
    end
    -- quit by default
    if not interactive then os.exit() end
