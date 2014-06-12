@@ -325,7 +325,10 @@ function monitor_G(cb)
          end
          evercreated[key] = true
          rawset(G,key,val)
-      end
+      end,
+      __index = function (table, key)
+         error("attempt to read undeclared variable "..key, 2)
+      end,
    })
 end
 
