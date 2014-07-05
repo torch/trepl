@@ -310,24 +310,46 @@ end
 
 -- Monitor Globals
 function monitor_G(cb)
+   -- Force load of penlight packages:
+   stringx = require 'pl.stringx'
+   tablex = require 'pl.tablex'
+   path = require 'pl.path'
+   dir = require 'pl.dir'
+
+   -- Store current globals:
    local evercreated = {}
    for k in pairs(_G) do
       evercreated[k] = true
    end
+
+   -- Overwrite global namespace meta tables to monitor it:
    setmetatable(_G, {
       __newindex = function(G,key,val)
          if not evercreated[key] then 
             if cb then
                cb(key)
             else
-               print('created a global variable: ' .. key)
+               local file = debug.getinfo(2).source:gsub('^@','')
+               local line = debug.getinfo(2).currentline
+               if line > 0 then
+                  print(colors.red .. 'created global variable: ' 
+                     .. colors.blue .. key .. colors.none
+                     .. ' @ ' .. colors.magenta .. file .. colors.none 
+                     .. ':' .. colors.green .. line .. colors.none
+                  )
+               else
+                  print(colors.red .. 'created global variable: ' 
+                     .. colors.blue .. key .. colors.none
+                     .. ' @ ' .. colors.yellow .. '[C-module]' .. colors.none
+                  )
+               end
             end
          end
          evercreated[key] = true
          rawset(G,key,val)
       end,
       __index = function (table, key)
-         error("attempt to read undeclared variable "..key, 2)
+         error(colors.red .. "attempt to read undeclared variable " .. colors.blue .. key .. colors.none, 2)
       end,
    })
 end
