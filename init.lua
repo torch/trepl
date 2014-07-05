@@ -315,6 +315,7 @@ function monitor_G(cb)
    tablex = require 'pl.tablex'
    path = require 'pl.path'
    dir = require 'pl.dir'
+   text = require 'pl.text'
 
    -- Store current globals:
    local evercreated = {}
