@@ -22,43 +22,8 @@ pcall(require,'torch')
 pcall(require,'paths')
 
 -- Colors:
-local colors = {
-   none = '\27[0m',
-   black = '\27[0;30m',
-   red = '\27[0;31m',
-   green = '\27[0;32m',
-   yellow = '\27[0;33m',
-   blue = '\27[0;34m',
-   magenta = '\27[0;35m',
-   cyan = '\27[0;36m',
-   white = '\27[0;37m',
-   Black = '\27[1;30m',
-   Red = '\27[1;31m',
-   Green = '\27[1;32m',
-   Yellow = '\27[1;33m',
-   Blue = '\27[1;34m',
-   Magenta = '\27[1;35m',
-   Cyan = '\27[1;36m',
-   White = '\27[1;37m',
-   _black = '\27[40m',
-   _red = '\27[41m',
-   _green = '\27[42m',
-   _yellow = '\27[43m',
-   _blue = '\27[44m',
-   _magenta = '\27[45m',
-   _cyan = '\27[46m',
-   _white = '\27[47m'
-}
-
--- Apply:
-local c
-if true then
-   c = function(color, txt)
-      return colors[color] .. txt .. colors.none
-   end
-else
-   c = function(color,txt) return txt end
-end
+local colors = require 'trepl.colors'
+local col = require 'trepl.colorize'
 
 -- If no Torch:
 if not torch then
@@ -138,23 +103,23 @@ end
 -- a function to colorize output:
 local function colorize(object,nested)
    -- Apply:
-   local apply = c
+   local apply = col
    
    -- Type?
    if object == nil then
-      return apply('Black', 'nil')
+      return apply['Black']('nil')
    elseif type(object) == 'number' then
-      return apply('cyan', tostring(object))
+      return apply['cyan'](tostring(object))
    elseif type(object) == 'boolean' then
-      return apply('blue', tostring(object))
+      return apply['blue'](tostring(object))
    elseif type(object) == 'string' then
       if nested then
-         return apply('Black','"')..apply('green', object)..apply('Black','"')
+         return apply['Black']('"')..apply['green'](object)..apply['Black']('"')
       else
-         return apply('none', object)
+         return apply['none'](object)
       end
    elseif type(object) == 'function' then
-      return apply('magenta', tostring(object))
+      return apply['magenta'](tostring(object))
    elseif type(object) == 'userdata' or type(object) == 'cdata' then
       local tp = torch.typename(object) or ''
       if tp:find('torch.*Tensor') then
@@ -165,14 +130,14 @@ local function colorize(object,nested)
          tp = tostring(object)
       end
       if tp ~= '' then
-         return apply('red', tp)
+         return apply['red'](tp)
       else
-         return apply('red', tostring(object))
+         return apply['red'](tostring(object))
       end
    elseif type(object) == 'table' then
-      return apply('green', tostring(object))
+      return apply['green'](tostring(object))
    else
-      return apply('_black', tostring(object))
+      return apply['_black'](tostring(object))
    end
 end
 
@@ -427,7 +392,7 @@ $endif
       timer_stop = function()
          local step = t:time().real - start
          for i = 1,70 do io.write(' ') end
-         print(c('Black',string.format('[%0.04fs]', step)))
+         print(col.Black(string.format('[%0.04fs]', step)))
       end
    else
       timer_start = function() end
@@ -475,7 +440,7 @@ $endif
                local f = io.popen(aliases .. ' ' .. cline)
                local res = f:read('*a')
                f:close()
-               io.write(c('none',res)) io.flush()
+               io.write(col.none(res)) io.flush()
                table.insert(_RESULTS, res)
                _LAST = _RESULTS[#_RESULTS]
             else
@@ -654,7 +619,7 @@ function repl_linenoise()
       timer_stop = function()
          local step = t:time().real - start
          for i = 1,70 do io.write(' ') end
-         print(c('Black',string.format('[%0.04fs]', step)))
+         print(col.Black(string.format('[%0.04fs]', step)))
       end
    else
       timer_start = function() end
@@ -685,7 +650,7 @@ function repl_linenoise()
             local f = io.popen(aliases .. ' ' .. line)
             local res = f:read('*a')
             f:close()
-            io.write(c('_black',res)) io.flush()
+            io.write(col._black(res)) io.flush()
             table.insert(_RESULTS, res)
          else
             os.execute(aliases .. ' ' .. line)
