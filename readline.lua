@@ -26,17 +26,20 @@ typedef char *rl_compentry_func_t (const char *, int);
 char **rl_completion_matches (const char *, rl_compentry_func_t *);
 
 const char *rl_basic_word_break_characters;
+const char *rl_completer_quote_characters;
 rl_completion_func_t *rl_attempted_completion_function;
 char *rl_line_buffer;
 int rl_completion_append_character;
 int rl_attempted_completion_over;
 const char *rl_readline_name;
+
+int rl_initialize();
 ]]
 
 local libreadline = ffi.load("readline")
 
 -- enable application specific parsing with inputrc
-libreadline.rl_readline_name = 'TREPL'
+libreadline.rl_readline_name = 'lua'
 
 function readline.completion_append_character(char)
    libreadline.rl_completion_append_character = #char > 0 and char:byte(1,1) or 0
@@ -55,6 +58,7 @@ function readline.shell(config)
       if config.word_break_characters then
          libreadline.rl_basic_word_break_characters = config.word_break_characters
       end
+      libreadline.rl_completer_quote_characters = '\'"'
 
       function libreadline.rl_attempted_completion_function(word, startpos, endpos)
          local strword = ffi.string(word)
@@ -78,6 +82,9 @@ function readline.shell(config)
          end)
       end
    end
+
+   -- re-initialize in case
+   libreadline.rl_initialize()
 
    -- main loop
    local running = true
