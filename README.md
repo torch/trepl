@@ -133,3 +133,31 @@ the content of what's evaluated. Use ; to stop it.
 > a:zero();
 > 
 ```
+
+Helpers
+-------
+
+Colors libraries can be loaded independently:
+
+```lua
+> c = require 'trepl.colorize'
+> print(c.red('a red string') .. c.Blue('a bold blue string'))
+```
+
+Globals
+-------
+
+global variables are a well known issue with Lua. `th` can be run
+with a flag `-g` that will monitor global variables creation and access.
+Creation of a variable will generate a warning message, while access
+will generate an error.
+
+```sh
+th -g
+> require 'sys';
+created global variable: sys @ [c-module]
+> a = 1
+created global variable: a @ a = 1
+> b
+error: attempt to read undeclared variable b
+```
