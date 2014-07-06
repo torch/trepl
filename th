@@ -117,6 +117,16 @@ if asyncrepl then
    async.repl()
    async.go()
 else
+   -- verbose
+   print
+[[
+  _____              _          
+ |_   _|            | |      |  Torch7
+   | | ___  _ __ ___| |__    |  Scientific computing for LuaJIT.
+   | |/ _ \| '__/ __| '_ \   |  
+   | | (_) | | | (__| | | |  |  https://github.com/torch
+   \_/\___/|_|  \___|_| |_|  |  http://torch.ch
+]]
    -- regular repl
    repl()
 end

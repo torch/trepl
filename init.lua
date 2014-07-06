@@ -370,9 +370,9 @@ end
 local function prompt(aux)
    local s
    if not aux then
-      s = '> '
+      s = 'th> '
    else
-      s = '>> '
+      s = '..> '
    end
    return s
 end
