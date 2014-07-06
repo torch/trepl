@@ -371,7 +371,7 @@ function repl_readline()
       local finputrc = io.open(inputrc,'w')
       local trepl =
 [[
-$if TREPL
+$if lua
    # filter up and down arrows using characters typed so far
    "\e[A":history-search-backward
    "\e[B":history-search-forward
