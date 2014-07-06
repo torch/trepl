@@ -114,10 +114,7 @@ end
 
 -- start repl
 if asyncrepl then
-   -- BETA: async repl
-   async.repl()
-   async.go()
-else
+
    -- verbose
    print(
 [[
@@ -126,9 +123,44 @@ else
    | | ___  _ __ ___| |__    ]]..col.White[[|  ]]..col.Black[[Scientific computing for LuaJIT.        ]]..[[ 
    | |/ _ \| '__/ __| '_ \   ]]..col.White[[|                                          ]]..[[ 
    | | (_) | | | (__| | | |  ]]..col.White[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
-   \_/\___/|_|  \___|_| |_|  ]]..col.White[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
+   |_|\___/|_|  \___|_| |_|  ]]..col.White[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
+
+]] .. col.red('WARNING: ') .. col.Black('you are running an experimental asynchronous interpreter for Torch.') .. [[ 
+]] .. col.Black('Note 1: It has no support for readline/completion yet.') .. [[ 
+]] .. col.Black('Note 2: The event-loop has been started in the background: ') .. col.none('async.go()') .. [[ 
+]] .. col.Black('        Statements like ') .. col.none('async.setInterval(1000, function() print("test") end)') .. [[ 
+]] .. col.Black('        are run asynchronously to the interpreter. ') .. [[  
+]] .. col.Black('Note 3: See ') .. col.blue('http://github.com/clementfarabet/async') .. col.Black(' for help' ) .. [[
+
 ]]
 )
+
+   -- BETA: async repl
+   async.repl()
+   async.go()
+
+else
+
+   -- verbose
+   print(
+[[
+  _____              _          
+ |_   _|            | |      ]]..col.White[[|  Torch7                                  ]]..[[ 
+   | | ___  _ __ ___| |__    ]]..col.White[[|  ]]..col.Black[[Scientific computing for LuaJIT.        ]]..[[ 
+   | |/ _ \| '__/ __| '_ \   ]]..col.White[[|                                          ]]..[[ 
+   | | (_) | | | (__| | | |  ]]..col.White[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
+   |_|\___/|_|  \___|_| |_|  ]]..col.White[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
+]]
+)
+
+   -- globs?
+   if globs then
+      print(
+         col.red('WARNING: ') .. col.Black('global monitoring is on.\n') ..
+         col.Black('This is typically not a good idea when running a live interpreter.\n')
+      )
+   end
+
    -- regular repl
    repl()
 end
