@@ -119,11 +119,11 @@ if asyncrepl then
    print(
 [[
   _____              _          
- |_   _|            | |      ]]..col.White[[|  Torch7                                  ]]..[[ 
-   | | ___  _ __ ___| |__    ]]..col.White[[|  ]]..col.Black[[Scientific computing for LuaJIT.        ]]..[[ 
-   | |/ _ \| '__/ __| '_ \   ]]..col.White[[|                                          ]]..[[ 
-   | | (_) | | | (__| | | |  ]]..col.White[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
-   |_|\___/|_|  \___|_| |_|  ]]..col.White[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
+ |_   _|            | |      ]]..col.Black[[|  Torch7                                  ]]..[[ 
+   | | ___  _ __ ___| |__    ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[ 
+   | |/ _ \| '__/ __| '_ \   ]]..col.Black[[|                                          ]]..[[ 
+   | | (_) | | | (__| | | |  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
+   |_|\___/|_|  \___|_| |_|  ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
 
 ]] .. col.red('WARNING: ') .. col.Black('you are running an experimental asynchronous interpreter for Torch.') .. [[ 
 ]] .. col.Black('Note 1: It has no support for readline/completion yet.') .. [[ 
@@ -145,11 +145,11 @@ else
    print(
 [[
   _____              _          
- |_   _|            | |      ]]..col.White[[|  Torch7                                  ]]..[[ 
-   | | ___  _ __ ___| |__    ]]..col.White[[|  ]]..col.Black[[Scientific computing for LuaJIT.        ]]..[[ 
-   | |/ _ \| '__/ __| '_ \   ]]..col.White[[|                                          ]]..[[ 
-   | | (_) | | | (__| | | |  ]]..col.White[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
-   |_|\___/|_|  \___|_| |_|  ]]..col.White[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
+ |_   _|            | |      ]]..col.Black[[|  Torch7                                  ]]..[[ 
+   | | ___  _ __ ___| |__    ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[ 
+   | |/ _ \| '__/ __| '_ \   ]]..col.Black[[|                                          ]]..[[ 
+   | | (_) | | | (__| | | |  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
+   |_|\___/|_|  \___|_| |_|  ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
 ]]
 )
 
