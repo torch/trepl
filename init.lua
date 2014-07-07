@@ -359,6 +359,9 @@ _LAST = ''
 
 -- Readline:
 local readline_ok,readline = pcall(require,"trepl.readline")
+if not readline_ok then
+   print(col.red('WARNING: ') .. 'could not find/load readline, defaulting to linenoise')
+end
 
 -- REPL:
 function repl_readline()
@@ -528,14 +531,19 @@ end
 -- No readline -> LineNoise?
 local nextline
 if not readline_ok then
+   print('ici')
    -- Load linenoise:
    local ok,L = pcall(require,'linenoise')
+   ok = false
    if not ok then
       -- No readline, no linenoise... default to plain io:
       nextline = function()
          io.write(prompt()) io.flush()
          return io.read('*line')
       end
+
+      -- Really poor:
+      print(col.red('WARNING: ') .. 'could not find/load linenoise, defaulting to raw repl')
    else
       -- History:
       local history = os.getenv('HOME') .. '/.luahistory'
