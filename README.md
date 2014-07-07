@@ -1,5 +1,15 @@
-TREPL: A REPL for Torch/LuaJIT
-==============================
+TREPL: An advanced REPL for Torch/LuaJIT
+========================================
+
+```
+  ______             __   |  Torch7
+ /_  __/__  ________/ /   |  Scientific computing for LuaJIT.
+  / / / _ \/ __/ __/ _ \  |
+ /_/  \___/_/  \__/_//_/  |  https://github.com/torch
+                          |  http://torch.ch
+
+th>
+```
 
 A pure Lua REPL for LuaJIT, with heavy support for Torch types. 
 
@@ -27,6 +37,8 @@ Features:
 * Print all user globals with `who()`
 * Import a package's symbols globally with `import(package)`
 * Require is overloaded to provide relative search paths: `require('./mylocallib/')`
+* Optional strict global namespace monitoring
+* Optional async repl (based on [async](https://github.com/clementfarabet/async))
 
 Install
 -------
@@ -147,8 +159,9 @@ Colors libraries can be loaded independently:
 Globals
 -------
 
-global variables are a well known issue with Lua. `th` can be run
+Global variables are a well known issue with Lua. `th` can be run
 with a flag `-g` that will monitor global variables creation and access.
+
 Creation of a variable will generate a warning message, while access
 will generate an error.
 
@@ -161,3 +174,23 @@ created global variable: a @ a = 1
 > b
 error: attempt to read undeclared variable b
 ```
+
+Async repl [BETA]
+-----------------
+
+An asynchronous repl can be started with `-a`. Based on [async](https://github.com/clementfarabet/async), 
+this repl is non-blocking, and can be used to spawn/schedule asyncrhonous jobs. It is still beta, 
+and does not yet have readline support:
+
+```sh
+th -a
+> idx = 1
+> async.setInterval(1000, function() print('will be printed every second - step #' .. idx) idx = idx + 1 end)
+will be printed every second - step #1
+will be printed every second - step #2
+will be printed every second - step #3
+> idx = 20
+will be printed every second - step #20
+will be printed every second - step #21
+```
+
