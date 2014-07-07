@@ -28,8 +28,10 @@ char **rl_completion_matches (const char *, rl_compentry_func_t *);
 const char *rl_basic_word_break_characters;
 const char *rl_completer_quote_characters;
 rl_completion_func_t *rl_attempted_completion_function;
+rl_completion_func_t *rl_completion_entry_function;
 char *rl_line_buffer;
 int rl_completion_append_character;
+int rl_completion_suppress_append;
 int rl_attempted_completion_over;
 const char *rl_readline_name;
 
@@ -60,31 +62,23 @@ function readline.shell(config)
       end
       libreadline.rl_completer_quote_characters = '\'"'
 
-      function libreadline.rl_attempted_completion_function(word, startpos, endpos)
+      local matches
+      libreadline.rl_completion_entry_function = function(word, i)
+         libreadline.rl_attempted_completion_over = 1
          local strword = ffi.string(word)
          local buffer = ffi.string(libreadline.rl_line_buffer)
-         local matches = config.complete(strword, buffer, startpos, endpos)
-         if not matches then return nil end
-         -- if matches is an empty array, tell readline to not call default completion (file)
-         libreadline.rl_attempted_completion_over = 1
-         -- translate matches table to C strings 
-         -- (there is probably more efficient ways to do it)
-         return libreadline.rl_completion_matches(word, function(text, i)
-            local match = matches[i+1]
-            if match then
-               -- readline will free the C string by itself, so create copies of them
-               local buf = ffi.C.malloc(#match + 1)
-               ffi.copy(buf, match, #match+1)
-               return buf
-            else
-               return ffi.new("void*", nil)
-            end
-         end)
+         if i == 0 then
+            matches = config.complete(strword, buffer, startpos, endpos)
+         end
+         local match = matches[i+1]
+         if match then
+            -- readline will free the C string by itself, so create copies of them
+            local buf = ffi.C.malloc(#match + 1)
+            ffi.copy(buf, match, #match+1)
+            return buf
+         end
       end
    end
-
-   -- re-initialize in case
-   libreadline.rl_initialize()
 
    -- main loop
    local running = true
