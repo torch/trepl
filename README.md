@@ -1,5 +1,5 @@
-TREPL: An advanced REPL for Torch/LuaJIT
-========================================
+TREPL: A REPL for Torch
+=======================
 
 ```
   ______             __   |  Torch7
