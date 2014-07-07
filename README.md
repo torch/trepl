@@ -33,6 +33,7 @@ Features:
 * Each command is profiled, timing is reported
 * No need for '=' to print
 * Easy help with: `? funcname`
+* Self help: `?`
 * Shell commands with: $ cmd (example: `$ ls`)
 * Print all user globals with `who()`
 * Import a package's symbols globally with `import(package)`

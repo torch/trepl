@@ -25,6 +25,40 @@ pcall(require,'paths')
 local colors = require 'trepl.colors'
 local col = require 'trepl.colorize'
 
+-- Help string:
+local selfhelp =  [[
+  ______             __   
+ /_  __/__  ________/ /   
+  / / / _ \/ __/ __/ _ \  
+ /_/  \___/_/  \__/_//_/ 
+                         
+]]..col.red('th')..[[ is an enhanced interpreter (repl) for Torch7/LuaJIT.
+
+]]..col.blue('Features:')..[[ 
+
+   Tab-completion on nested namespaces
+   Tab-completion on disk files (when opening a string)
+   History
+   Pretty print (table introspection and coloring)
+   Auto-print after eval (can be stopped with ;)
+   Each command is profiled, timing is reported
+   No need for '=' to print
+   Easy help on functions/packages: 
+   ]]..col.magenta("? torch.randn")..[[ 
+   Shell commands with: 
+   ]]..col.magenta("$ ls -l")..[[ 
+   Print all user globals with:
+   ]]..col.magenta("who()")..[[ 
+   Import a package's symbols globally with:
+   ]]..col.magenta("import 'torch' ")..[[ 
+   Require is overloaded to provide relative (form within a file) search paths:
+   ]]..col.magenta("require './local/lib' ")..[[ 
+   Optional strict global namespace monitoring:
+   ]]..col.magenta('th -g')..[[  
+   Optional async repl (based on https://github.com/clementfarabet/async):
+   ]]..col.magenta('th -a')..[[  
+]]
+
 -- If no Torch:
 if not torch then
    torch = {
@@ -468,7 +502,13 @@ $endif
          if line and line:find('^%s-?') then
             local ok = pcall(require,'dok')
             if ok then
-               line = 'help(' .. line:gsub('^%s-?','') .. ')'
+               local pkg = line:gsub('^%s-?','')
+               if pkg:gsub('%s*','') == '' then
+                  print(selfhelp)
+                  return
+               else
+                  line = 'help(' .. pkg .. ')'
+               end
             else
                print('error: could not load help backend')
                return line
