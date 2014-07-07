@@ -275,6 +275,13 @@ end
 
 -- Monitor Globals
 function monitor_G(cb)
+   -- user CB or strict mode
+   local strict
+   if type(cb) == 'boolean' then
+      strict = true
+      cb = nil
+   end
+
    -- Force load of penlight packages:
    stringx = require 'pl.stringx'
    tablex = require 'pl.tablex'
@@ -297,14 +304,18 @@ function monitor_G(cb)
             else
                local file = debug.getinfo(2).source:gsub('^@','')
                local line = debug.getinfo(2).currentline
+               local report = print
+               if strict then
+                  report = error
+               end
                if line > 0 then
-                  print(colors.red .. 'created global variable: ' 
+                  report(colors.red .. 'created global variable: ' 
                      .. colors.blue .. key .. colors.none
                      .. ' @ ' .. colors.magenta .. file .. colors.none 
                      .. ':' .. colors.green .. line .. colors.none
                   )
                else
-                  print(colors.red .. 'created global variable: ' 
+                  report(colors.red .. 'created global variable: ' 
                      .. colors.blue .. key .. colors.none
                      .. ' @ ' .. colors.yellow .. '[C-module]' .. colors.none
                   )
