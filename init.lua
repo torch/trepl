@@ -187,21 +187,25 @@ function print_new(...)
       local depth = depth or 0
       local tab = depth*4
       local line = function(s) for i=1,tab do io.write(' ') end rawprint(s) end
-      line('{')
-      tab = tab+2
-      for k,v in pairs(obj) do
-         if type(v) == 'table' then
-            if depth >= (ndepth-1) or next(v) == nil then
-               line(tostring(k) .. ' : ' .. colorize(v,true))
+      if next(obj) then
+         line('{')
+         tab = tab+2
+         for k,v in pairs(obj) do
+            if type(v) == 'table' then
+               if depth >= (ndepth-1) or next(v) == nil then
+                  line(tostring(k) .. ' : {}')
+               else
+                  line(tostring(k) .. ' : ') printrecursive(v,depth+1)
+               end
             else
-               line(tostring(k) .. ' : ') printrecursive(v,depth+1)
+               line(tostring(k) .. ' : ' .. colorize(v,true))
             end
-         else
-            line(tostring(k) .. ' : ' .. colorize(v,true))
          end
+         tab = tab-2
+         line('}')
+      else
+         line('{}')
       end
-      tab = tab-2
-      line('}')
    end
    for i = 1,select('#',...) do
       local obj = select(i,...)
@@ -216,7 +220,6 @@ function print_new(...)
          end
       elseif getmetatable(obj) and getmetatable(obj).__tostring then
          rawprint(obj)
-         --printrecursive(obj)
       else
          printrecursive(obj) 
       end
