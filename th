@@ -10,10 +10,11 @@ Options:
   -h,--help          print this help
   -a,--async         preload async (libuv) and start async repl (BETA)
   -g,--globals       monitor global variables (print a warning on creation)
+  -x,--gfx           start gfx server and load gfx env
   -i,--interactive   enter the REPL after executing a script ]==]
 
 -- parse arguments
-local asyncrepl,run,interactive,progargs,statement,lib,globs,_
+local asyncrepl,run,interactive,progargs,statement,lib,globs,lgfx,_
 local parg = arg
 local nextarg
 for _,arg in ipairs(parg) do
@@ -59,6 +60,8 @@ for _,arg in ipairs(parg) do
             async = require 'async'
          elseif shortopt == 'g' or option == 'globals' then
             globs = true
+         elseif shortopt == 'x' or option == 'gfx' then
+            lgfx = true
          elseif shortopt == 'l' then
             nextarg = 'lib'
          else
@@ -83,6 +86,16 @@ end
 -- load repl
 local repl = require 'trepl'
 local col = require 'trepl.colorize'
+
+-- load gfx env?
+if lgfx then
+   local ok = pcall(require, 'gfx.js')
+   if ok then
+      gfx.startserver()
+   else
+      print('could not load gfx.js, please install with: luarocks install gfx.js')
+   end
+end
 
 -- monitor globals
 if globs then
