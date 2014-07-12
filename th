@@ -92,6 +92,7 @@ if lgfx then
    local ok = pcall(require, 'gfx.js')
    if ok then
       gfx.startserver()
+      gfx.show()
    else
       print('could not load gfx.js, please install with: luarocks install gfx.js')
    end
