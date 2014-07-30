@@ -1,0 +1,179 @@
+#!/usr/bin/env luajit
+
+-- help
+local help = [==[
+Usage: th [options] [script.lua [arguments]]
+
+Options:
+  -l name            load library name
+  -e statement       execute statement
+  -h,--help          print this help
+  -a,--async         preload async (libuv) and start async repl (BETA)
+  -g,--globals       monitor global variables (print a warning on creation)
+  -x,--gfx           start gfx server and load gfx env
+  -i,--interactive   enter the REPL after executing a script ]==]
+
+-- parse arguments
+local asyncrepl,run,interactive,progargs,statement,lib,globs,lgfx,_
+local parg = arg
+local nextarg
+for _,arg in ipairs(parg) do
+   -- nextarg set?
+   if nextarg == 'exec' then
+      statement = arg
+      nextarg = nil
+   elseif nextarg == 'lib' then
+      lib = arg
+      nextarg = nil
+   else
+       _,_,lib = arg:find('^%-l(.*)')
+       if lib == '' then lib = nil end
+   end
+   -- load libraries
+   if lib then
+      local ok = pcall(require,lib)
+      if not ok then
+         print('could not load ' .. lib .. ', skipping')
+      end
+   elseif progargs then
+      -- program args
+      table.insert(progargs,arg)
+   elseif not statement then
+      -- option?
+      local _,_,option = arg:find('^%-%-(.*)')
+      local shortopt
+      if not option then
+         _,_,shortopt = arg:find('^%-(.*)')
+      end
+      if option or shortopt then
+         -- help
+         if shortopt == 'h' or option == 'help' then
+            print(help)
+            os.exit()
+         elseif shortopt == 'i' or option == 'interactive' then
+            interactive = true
+         elseif shortopt == 'e' then
+            nextarg = 'exec'
+         elseif shortopt == 'a' or option == 'async' then
+            asyncrepl = true
+            interactive = true
+            async = require 'async'
+         elseif shortopt == 'g' or option == 'globals' then
+            globs = true
+         elseif shortopt == 'x' or option == 'gfx' then
+            lgfx = true
+         elseif shortopt == 'l' then
+            nextarg = 'lib'
+         else
+            -- unknown
+            print('Error: unrecognized flag --' .. option)
+            print(help)
+            os.exit()
+         end
+      else
+         -- exec program
+         run = arg
+         progargs = {}
+         for k,v in pairs(parg) do
+            if k <= 0 then
+               progargs[k] = v
+            end
+         end
+      end
+   end
+end
+
+-- load repl
+local repl = require 'trepl'
+local col = require 'trepl.colorize'
+
+-- load gfx env?
+if lgfx then
+   local ok = pcall(require, 'gfx.js')
+   if ok then
+      gfx.startserver()
+      gfx.show()
+   else
+      print('could not load gfx.js, please install with: luarocks install gfx.js')
+   end
+end
+
+-- monitor globals
+if globs then
+   monitor_G()
+end
+
+-- statement
+if statement then
+   -- exec statement:
+   local s = loadstring(statement)
+   local ok,res = pcall(s)
+   if not ok then
+      print(res)
+      os.exit()
+   end
+   -- quit by default
+   if not interactive then os.exit() end
+end
+
+-- run program
+if run then
+   -- set prog args:
+   arg = progargs
+   -- run
+   dofile(run)
+   -- quit by default
+   if not interactive then os.exit() end
+end
+
+-- start repl
+if asyncrepl then
+   -- verbose
+   print(
+[[
+                            
+  ______             __   ]]..col.Black[[|  Torch7                                  ]]..[[ 
+ /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[ 
+  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|                                          ]]..[[ 
+ /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
+                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
+
+]] .. col.red('WARNING: ') .. col.Black('you are running an experimental asynchronous interpreter for Torch.') .. [[ 
+]] .. col.Black('Note 1: It has no support for readline/completion yet.') .. [[ 
+]] .. col.Black('Note 2: The event-loop has been started in the background: ') .. col.none('async.go()') .. [[ 
+]] .. col.Black('        Statements like ') .. col.none('async.setInterval(1000, function() print("test") end)') .. [[ 
+]] .. col.Black('        are run asynchronously to the interpreter. ') .. [[  
+]] .. col.Black('Note 3: See ') .. col.blue('http://github.com/clementfarabet/async') .. col.Black(' for help' ) .. [[
+
+]]
+)
+
+   -- BETA: async repl
+   async.repl()
+   async.go()
+
+else
+
+   -- verbose
+   print(
+[[
+
+  ______             __   ]]..col.Black[[|  Torch7                                  ]]..[[ 
+ /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[ 
+  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|                                          ]]..[[ 
+ /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
+                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
+]]
+)
+
+   -- globs?
+   if globs then
+      print(
+         col.red('WARNING: ') .. col.Black('global monitoring is on.\n') ..
+         col.Black('This is typically not a good idea when running a live interpreter.\n')
+      )
+   end
+
+   -- regular repl
+   repl()
+end
