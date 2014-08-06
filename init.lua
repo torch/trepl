@@ -585,7 +585,6 @@ end
 -- No readline -> LineNoise?
 local nextline
 if not readline_ok then
-   print('ici')
    -- Load linenoise:
    local ok,L = pcall(require,'linenoise')
    ok = false
