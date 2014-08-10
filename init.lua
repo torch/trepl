@@ -138,7 +138,7 @@ end
 local function colorize(object,nested)
    -- Apply:
    local apply = col
-   
+
    -- Type?
    if object == nil then
       return apply['Black']('nil')
@@ -221,7 +221,7 @@ function print_new(...)
       elseif getmetatable(obj) and getmetatable(obj).__tostring then
          rawprint(obj)
       else
-         printrecursive(obj) 
+         printrecursive(obj)
       end
    end
 end
@@ -335,9 +335,9 @@ function monitor_G(cb)
    -- Overwrite global namespace meta tables to monitor it:
    setmetatable(_G, {
       __newindex = function(G,key,val)
-         if not evercreated[key] then 
+         if not evercreated[key] then
             if cb then
-               cb(key)
+               cb(key,'newindex')
             else
                local file = debug.getinfo(2).source:gsub('^@','')
                local line = debug.getinfo(2).currentline
@@ -346,13 +346,13 @@ function monitor_G(cb)
                   report = error
                end
                if line > 0 then
-                  report(colors.red .. 'created global variable: ' 
+                  report(colors.red .. 'created global variable: '
                      .. colors.blue .. key .. colors.none
-                     .. ' @ ' .. colors.magenta .. file .. colors.none 
+                     .. ' @ ' .. colors.magenta .. file .. colors.none
                      .. ':' .. colors.green .. line .. colors.none
                   )
                else
-                  report(colors.red .. 'created global variable: ' 
+                  report(colors.red .. 'created global variable: '
                      .. colors.blue .. key .. colors.none
                      .. ' @ ' .. colors.yellow .. '[C-module]' .. colors.none
                   )
@@ -363,7 +363,28 @@ function monitor_G(cb)
          rawset(G,key,val)
       end,
       __index = function (table, key)
-         error(colors.red .. "attempt to read undeclared variable " .. colors.blue .. key .. colors.none, 2)
+         if cb then
+            cb(key,'index')
+         else
+            local file = debug.getinfo(2).source:gsub('^@','')
+            local line = debug.getinfo(2).currentline
+            local report = print
+            if strict then
+               report = error
+            end
+            if line > 0 then
+               report(colors.red .. 'atempt to read undeclared variable: '
+                  .. colors.blue .. key .. colors.none
+                  .. ' @ ' .. colors.magenta .. file .. colors.none
+                  .. ':' .. colors.green .. line .. colors.none
+               )
+            else
+               report(colors.red .. 'atempt to read undeclared variable: '
+                  .. colors.blue .. key .. colors.none
+                  .. ' @ ' .. colors.yellow .. '[C-module]' .. colors.none
+               )
+            end
+         end
       end,
    })
 end
@@ -449,7 +470,7 @@ $endif
       timer_start = function() end
       timer_stop = function() end
    end
-   
+
    -- History:
    local history = os.getenv('HOME') .. '/.luahistory'
 
@@ -474,7 +495,7 @@ $endif
          if cmd:sub(1,1) == "=" then
             cmd = "return "..cmd:sub(2)
          end
-      
+
          -- Interupt?
          if line == 'exit' then
             io.stdout:write('Do you really want to exit ([y]/n)? ') io.flush()
@@ -483,7 +504,7 @@ $endif
                os.exit()
             end
          end
-      
+
          -- OS Commands:
          if line and line:find('^%s-%$') then
             local cline = line:gsub('^%s-%$','')
@@ -500,7 +521,7 @@ $endif
             timer_stop()
             return line
          end
-         
+
          -- Shortcut to get help:
          if line and line:find('^%s-?') then
             local ok = pcall(require,'dok')
@@ -534,10 +555,10 @@ $endif
          end
 
          -- run ok:
-         if ok then 
+         if ok then
             _LAST = _RESULTS[#_RESULTS]
             timer_stop()
-            return line 
+            return line
          end
 
          -- parsed ok, but failed to run (code error):
@@ -723,7 +744,7 @@ function repl_linenoise()
       if line and line:find('^%s-=') then
          line = line:gsub('^%s-=','')
       end
-      
+
       -- Shortcut to get help:
       if line and line:find('^%s-?') then
          local ok = pcall(require,'dok')
