@@ -27,14 +27,14 @@ local col = require 'trepl.colorize'
 
 -- Help string:
 local selfhelp =  [[
-  ______             __   
- /_  __/__  ________/ /   
-  / / / _ \/ __/ __/ _ \  
- /_/  \___/_/  \__/_//_/ 
-                         
+  ______             __
+ /_  __/__  ________/ /
+  / / / _ \/ __/ __/ _ \
+ /_/  \___/_/  \__/_//_/
+
 ]]..col.red('th')..[[ is an enhanced interpreter (repl) for Torch7/LuaJIT.
 
-]]..col.blue('Features:')..[[ 
+]]..col.blue('Features:')..[[
 
    Tab-completion on nested namespaces
    Tab-completion on disk files (when opening a string)
@@ -43,20 +43,20 @@ local selfhelp =  [[
    Auto-print after eval (can be stopped with ;)
    Each command is profiled, timing is reported
    No need for '=' to print
-   Easy help on functions/packages: 
-   ]]..col.magenta("? torch.randn")..[[ 
-   Shell commands with: 
-   ]]..col.magenta("$ ls -l")..[[ 
+   Easy help on functions/packages:
+   ]]..col.magenta("? torch.randn")..[[
+   Shell commands with:
+   ]]..col.magenta("$ ls -l")..[[
    Print all user globals with:
-   ]]..col.magenta("who()")..[[ 
+   ]]..col.magenta("who()")..[[
    Import a package's symbols globally with:
-   ]]..col.magenta("import 'torch' ")..[[ 
+   ]]..col.magenta("import 'torch' ")..[[
    Require is overloaded to provide relative (form within a file) search paths:
-   ]]..col.magenta("require './local/lib' ")..[[ 
+   ]]..col.magenta("require './local/lib' ")..[[
    Optional strict global namespace monitoring:
-   ]]..col.magenta('th -g')..[[  
+   ]]..col.magenta('th -g')..[[
    Optional async repl (based on https://github.com/clementfarabet/async):
-   ]]..col.magenta('th -a')..[[  
+   ]]..col.magenta('th -a')..[[
 ]]
 
 -- If no Torch:
@@ -138,7 +138,7 @@ end
 local function colorize(object,nested)
    -- Apply:
    local apply = col
-   
+
    -- Type?
    if object == nil then
       return apply['Black']('nil')
@@ -221,7 +221,7 @@ function print_new(...)
       elseif getmetatable(obj) and getmetatable(obj).__tostring then
          rawprint(obj)
       else
-         printrecursive(obj) 
+         printrecursive(obj)
       end
    end
 end
@@ -335,7 +335,7 @@ function monitor_G(cb)
    -- Overwrite global namespace meta tables to monitor it:
    setmetatable(_G, {
       __newindex = function(G,key,val)
-         if not evercreated[key] then 
+         if not evercreated[key] then
             if cb then
                cb(key)
             else
@@ -346,13 +346,13 @@ function monitor_G(cb)
                   report = error
                end
                if line > 0 then
-                  report(colors.red .. 'created global variable: ' 
+                  report(colors.red .. 'created global variable: '
                      .. colors.blue .. key .. colors.none
-                     .. ' @ ' .. colors.magenta .. file .. colors.none 
+                     .. ' @ ' .. colors.magenta .. file .. colors.none
                      .. ':' .. colors.green .. line .. colors.none
                   )
                else
-                  report(colors.red .. 'created global variable: ' 
+                  report(colors.red .. 'created global variable: '
                      .. colors.blue .. key .. colors.none
                      .. ' @ ' .. colors.yellow .. '[C-module]' .. colors.none
                   )
@@ -449,7 +449,7 @@ $endif
       timer_start = function() end
       timer_stop = function() end
    end
-   
+
    -- History:
    local history = os.getenv('HOME') .. '/.luahistory'
 
@@ -474,7 +474,7 @@ $endif
          if cmd:sub(1,1) == "=" then
             cmd = "return "..cmd:sub(2)
          end
-      
+
          -- Interupt?
          if line == 'exit' then
             io.stdout:write('Do you really want to exit ([y]/n)? ') io.flush()
@@ -483,7 +483,7 @@ $endif
                os.exit()
             end
          end
-      
+
          -- OS Commands:
          if line and line:find('^%s-%$') then
             local cline = line:gsub('^%s-%$','')
@@ -500,7 +500,7 @@ $endif
             timer_stop()
             return line
          end
-         
+
          -- Shortcut to get help:
          if line and line:find('^%s-?') then
             local ok = pcall(require,'dok')
@@ -534,10 +534,10 @@ $endif
          end
 
          -- run ok:
-         if ok then 
+         if ok then
             _LAST = _RESULTS[#_RESULTS]
             timer_stop()
-            return line 
+            return line
          end
 
          -- parsed ok, but failed to run (code error):
@@ -723,7 +723,7 @@ function repl_linenoise()
       if line and line:find('^%s-=') then
          line = line:gsub('^%s-=','')
       end
-      
+
       -- Shortcut to get help:
       if line and line:find('^%s-?') then
          local ok = pcall(require,'dok')
