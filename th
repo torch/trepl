@@ -9,12 +9,13 @@ Options:
   -e statement       execute statement
   -h,--help          print this help
   -a,--async         preload async (libuv) and start async repl (BETA)
-  -g,--globals       monitor global variables (print a warning on creation)
+  -g,--globals       monitor global variables (print a warning on creation/access)
+  -gg,--gglobals     monitor global variables (throw an error on creation/access)
   -x,--gfx           start gfx server and load gfx env
   -i,--interactive   enter the REPL after executing a script ]==]
 
 -- parse arguments
-local asyncrepl,run,interactive,progargs,statement,lib,globs,lgfx,_
+local asyncrepl,run,interactive,progargs,statement,lib,globs,sglobs,lgfx,_
 local parg = arg
 local nextarg
 for _,arg in ipairs(parg) do
@@ -60,6 +61,8 @@ for _,arg in ipairs(parg) do
             async = require 'async'
          elseif shortopt == 'g' or option == 'globals' then
             globs = true
+         elseif shortopt == 'gg' or option == 'gglobals' then
+            sglobs = true
          elseif shortopt == 'x' or option == 'gfx' then
             lgfx = true
          elseif shortopt == 'l' then
@@ -101,6 +104,8 @@ end
 -- monitor globals
 if globs then
    monitor_G()
+elseif sglobs then
+   monitor_G(true)
 end
 
 -- statement
@@ -131,18 +136,18 @@ if asyncrepl then
    -- verbose
    print(
 [[
-                            
-  ______             __   ]]..col.Black[[|  Torch7                                  ]]..[[ 
- /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[ 
-  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|                                          ]]..[[ 
- /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
-                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
 
-]] .. col.red('WARNING: ') .. col.Black('you are running an experimental asynchronous interpreter for Torch.') .. [[ 
-]] .. col.Black('Note 1: It has no support for readline/completion yet.') .. [[ 
-]] .. col.Black('Note 2: The event-loop has been started in the background: ') .. col.none('async.go()') .. [[ 
-]] .. col.Black('        Statements like ') .. col.none('async.setInterval(1000, function() print("test") end)') .. [[ 
-]] .. col.Black('        are run asynchronously to the interpreter. ') .. [[  
+  ______             __   ]]..col.Black[[|  Torch7                                  ]]..[[
+ /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[
+  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|                                          ]]..[[
+ /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[
+                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[
+
+]] .. col.red('WARNING: ') .. col.Black('you are running an experimental asynchronous interpreter for Torch.') .. [[
+]] .. col.Black('Note 1: It has no support for readline/completion yet.') .. [[
+]] .. col.Black('Note 2: The event-loop has been started in the background: ') .. col.none('async.go()') .. [[
+]] .. col.Black('        Statements like ') .. col.none('async.setInterval(1000, function() print("test") end)') .. [[
+]] .. col.Black('        are run asynchronously to the interpreter. ') .. [[
 ]] .. col.Black('Note 3: See ') .. col.blue('http://github.com/clementfarabet/async') .. col.Black(' for help' ) .. [[
 
 ]]
@@ -158,11 +163,11 @@ else
    print(
 [[
 
-  ______             __   ]]..col.Black[[|  Torch7                                  ]]..[[ 
- /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[ 
-  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|                                          ]]..[[ 
- /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
-                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
+  ______             __   ]]..col.Black[[|  Torch7                                  ]]..[[
+ /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[
+  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|                                          ]]..[[
+ /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[
+                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[
 ]]
 )
 

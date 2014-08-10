@@ -337,7 +337,7 @@ function monitor_G(cb)
       __newindex = function(G,key,val)
          if not evercreated[key] then
             if cb then
-               cb(key)
+               cb(key,'newindex')
             else
                local file = debug.getinfo(2).source:gsub('^@','')
                local line = debug.getinfo(2).currentline
@@ -363,7 +363,28 @@ function monitor_G(cb)
          rawset(G,key,val)
       end,
       __index = function (table, key)
-         error(colors.red .. "attempt to read undeclared variable " .. colors.blue .. key .. colors.none, 2)
+         if cb then
+            cb(key,'index')
+         else
+            local file = debug.getinfo(2).source:gsub('^@','')
+            local line = debug.getinfo(2).currentline
+            local report = print
+            if strict then
+               report = error
+            end
+            if line > 0 then
+               report(colors.red .. 'atempt to read undeclared variable: '
+                  .. colors.blue .. key .. colors.none
+                  .. ' @ ' .. colors.magenta .. file .. colors.none
+                  .. ':' .. colors.green .. line .. colors.none
+               )
+            else
+               report(colors.red .. 'atempt to read undeclared variable: '
+                  .. colors.blue .. key .. colors.none
+                  .. ' @ ' .. colors.yellow .. '[C-module]' .. colors.none
+               )
+            end
+         end
       end,
    })
 end
