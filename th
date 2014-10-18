@@ -26,7 +26,7 @@ for _,arg in ipairs(parg) do
    elseif nextarg == 'lib' then
       lib = arg
       nextarg = nil
-   else
+   elseif not progargs then
        _,_,lib = arg:find('^%-l(.*)')
        if lib == '' then lib = nil end
    end
