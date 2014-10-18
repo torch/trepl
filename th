@@ -18,7 +18,7 @@ Options:
 local asyncrepl,run,interactive,progargs,statement,lib,globs,sglobs,lgfx,_
 local parg = arg
 local nextarg
-for _,arg in ipairs(parg) do
+for karg,arg in ipairs(parg) do
    -- nextarg set?
    if nextarg == 'exec' then
       statement = arg
@@ -75,13 +75,13 @@ for _,arg in ipairs(parg) do
          end
       else
          -- exec program
-         run = arg
+         run = arg -- program file
          progargs = {}
-         for k,v in pairs(parg) do
-            if k <= 0 then
-               progargs[k] = v
-            end
+         -- gobble the rest of the flags that come after the program filename
+         for i=karg+1, #parg do 
+            table.insert(progargs, parg[i])
          end
+         break;
       end
    end
 end
