@@ -80,6 +80,19 @@ table.insert(M.completers.value, function(t, sep)
   end
 end)
 
+-- tensor/storage completer
+table.insert(M.completers.value, function(t, sep)
+  if not (torch.isTensor(t) or torch.isStorage(t)) then return end
+  for k, v in pairs(t.__metatable) do
+    if type(k) == "number" and sep == "[" then 
+      coyield(k.."]")
+    elseif type(k) == "string" and (sep ~= ":" or type(v) == "function") then
+      coyield(k)
+    end
+  end		
+end)
+
+
 -- This function does the same job as the default completion of readline,
 -- completing paths and filenames. Rewritten because
 -- rl_basic_word_break_characters is different.
