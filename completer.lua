@@ -82,14 +82,21 @@ end)
 
 -- tensor/storage/torch-classes completer
 table.insert(M.completers.value, function(t, sep)
-  if torch.typename(t) == nil then return end
-  for k, v in pairs(t.__metatable) do
-    if type(k) == "number" and sep == "[" then 
-      coyield(k.."]")
-    elseif type(k) == "string" and (sep ~= ":" or type(v) == "function") then
-      coyield(k)
+  local function enumerate_metatable(typename)
+    if typename == nil then return end
+    local metatable = torch.getmetatable(typename)
+    for k, v in pairs(metatable) do
+      if type(k) == "number" and sep == "[" then
+        coyield(k.."]")
+      elseif type(k) == "string" and (sep ~= ":" or type(v) == "function") then
+        coyield(k)
+      end
     end
-  end		
+    if torch.typename(metatable) ~= typename then
+      enumerate_metatable(torch.typename(metatable))
+    end
+  end
+  enumerate_metatable(torch.typename(t))
 end)
 
 
