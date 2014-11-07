@@ -84,7 +84,7 @@ end)
 table.insert(M.completers.value, function(t, sep)
   local function enumerate_metatable(typename)
     if typename == nil then return end
-    metatable = torch.getmetatable(typename)
+    local metatable = torch.getmetatable(typename)
     for k, v in pairs(metatable) do
       if type(k) == "number" and sep == "[" then
         coyield(k.."]")
