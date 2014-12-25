@@ -95,7 +95,9 @@ if lgfx then
    local ok = pcall(require, 'gfx.js')
    if ok then
       gfx.startserver()
+      gfx.clear()
       gfx.show()
+      sys.sleep(1)
    else
       print('could not load gfx.js, please install with: luarocks install gfx.js')
    end
@@ -136,20 +138,20 @@ if asyncrepl then
    -- verbose
    print(
 [[
-                            
+ 
   ______             __   ]]..col.Black[[|  Torch7                                  ]]..[[ 
- /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[ 
+ /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for Lua.        ]]..[[ 
   / / / _ \/ __/ __/ _ \  ]]..col.Black[[|                                          ]]..[[ 
  /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
                           ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
-
+ 
 ]] .. col.red('WARNING: ') .. col.Black('you are running an experimental asynchronous interpreter for Torch.') .. [[ 
 ]] .. col.Black('Note 1: It has no support for readline/completion yet.') .. [[ 
 ]] .. col.Black('Note 2: The event-loop has been started in the background: ') .. col.none('async.go()') .. [[ 
 ]] .. col.Black('        Statements like ') .. col.none('async.setInterval(1000, function() print("test") end)') .. [[ 
-]] .. col.Black('        are run asynchronously to the interpreter. ') .. [[  
-]] .. col.Black('Note 3: See ') .. col.blue('http://github.com/clementfarabet/async') .. col.Black(' for help' ) .. [[
-
+]] .. col.Black('        are run asynchronously to the interpreter. ') .. [[ 
+]] .. col.Black('Note 3: See ') .. col.blue('http://github.com/clementfarabet/async') .. col.Black(' for help' ) .. [[ 
+ 
 ]]
 )
 
@@ -164,7 +166,7 @@ else
 [[
  
   ______             __   ]]..col.Black[[|  Torch7                                  ]]..[[ 
- /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for LuaJIT.        ]]..[[ 
+ /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for Lua.        ]]..[[ 
   / / / _ \/ __/ __/ _ \  ]]..col.Black[[|                                          ]]..[[ 
  /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch  ]]..[[ 
                           ]]..col.Black[[|  ]]..col.blue[[http://torch.ch           ]]..[[ 
