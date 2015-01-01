@@ -20,21 +20,30 @@
 -- Require Torch
 pcall(require,'torch')
 pcall(require,'paths')
+pcall(require,'sys')
+pcall(require,'xlua')
 
 -- Colors:
 local colors = require 'trepl.colors'
 local col = require 'trepl.colorize'
 
+-- Kill colors:
+function noColors()
+   for k,v in pairs(colors) do
+      colors[k] = ''
+   end
+end
+
 -- Help string:
 local selfhelp =  [[
-  ______             __   
- /_  __/__  ________/ /   
-  / / / _ \/ __/ __/ _ \  
- /_/  \___/_/  \__/_//_/ 
-                         
-]]..col.red('th')..[[ is an enhanced interpreter (repl) for Torch7/LuaJIT.
+  ______             __
+ /_  __/__  ________/ /
+  / / / _ \/ __/ __/ _ \
+ /_/  \___/_/  \__/_//_/
 
-]]..col.blue('Features:')..[[ 
+]]..col.red('th')..[[ is an enhanced interpreter (repl) for Torch7/Lua.
+
+]]..col.blue('Features:')..[[
 
    Tab-completion on nested namespaces
    Tab-completion on disk files (when opening a string)
@@ -43,20 +52,20 @@ local selfhelp =  [[
    Auto-print after eval (can be stopped with ;)
    Each command is profiled, timing is reported
    No need for '=' to print
-   Easy help on functions/packages: 
-   ]]..col.magenta("? torch.randn")..[[ 
-   Shell commands with: 
-   ]]..col.magenta("$ ls -l")..[[ 
+   Easy help on functions/packages:
+   ]]..col.magenta("? torch.randn")..[[
+   Shell commands with:
+   ]]..col.magenta("$ ls -l")..[[
    Print all user globals with:
-   ]]..col.magenta("who()")..[[ 
+   ]]..col.magenta("who()")..[[
    Import a package's symbols globally with:
-   ]]..col.magenta("import 'torch' ")..[[ 
+   ]]..col.magenta("import 'torch' ")..[[
    Require is overloaded to provide relative (form within a file) search paths:
-   ]]..col.magenta("require './local/lib' ")..[[ 
+   ]]..col.magenta("require './local/lib' ")..[[
    Optional strict global namespace monitoring:
-   ]]..col.magenta('th -g')..[[  
+   ]]..col.magenta('th -g')..[[
    Optional async repl (based on https://github.com/clementfarabet/async):
-   ]]..col.magenta('th -a')..[[  
+   ]]..col.magenta('th -a')..[[
 ]]
 
 -- If no Torch:
@@ -193,7 +202,7 @@ function print_new(...)
          for k,v in pairs(obj) do
             if type(v) == 'table' then
                if depth >= (ndepth-1) or next(v) == nil then
-                  line(tostring(k) .. ' : {}')
+                  line(tostring(k) .. ' : {...}')
                else
                   line(tostring(k) .. ' : ') printrecursive(v,depth+1)
                end
@@ -267,24 +276,50 @@ function require(name)
    if name:find('^%.') then
       local file = debug.getinfo(2).source:gsub('^@','')
       local dir = '.'
-      if path.exists(file) then
-         dir = path.dirname(file)
+      if paths.filep(file) then
+         dir = paths.dirname(file)
       end
-      local pkgpath = path.join(dir,name)
-      if path.isfile(pkgpath..'.lua') then
+      local pkgpath = paths.concat(dir,name)
+      if paths.filep(pkgpath..'.lua') then
          return dofile(pkgpath..'.lua')
-      elseif path.isfile(pkgpath) then
+      elseif pkgpath:find('%.th$') and paths.filep(pkgpath) then
+         return torch.load(pkgpath)
+      elseif pkgpath:find('%.net$') and paths.filep(pkgpath) then
+         require 'nn'
+         return torch.load(pkgpath)
+      elseif pkgpath:find('%.json$') and paths.filep(pkgpath) then
+         return require('cjson').decode(io.open(pkgpath):read('*all'))
+      elseif pkgpath:find('%.csv$') and paths.filep(pkgpath) then
+         return require('csv').load(pkgpath)
+      elseif paths.filep(pkgpath) then
          return dofile(pkgpath)
-      elseif path.isfile(pkgpath..'.so') then
+      elseif paths.filep(pkgpath..'.th') then
+         return torch.load(pkgpath..'.th')
+      elseif paths.filep(pkgpath..'.net') then
+         require 'nn'
+         return torch.load(pkgpath..'.net')
+      elseif paths.filep(pkgpath..'.json') then
+         return require('cjson').decode(io.open(pkgpath..'.json'):read('*all'))
+      elseif paths.filep(pkgpath..'.csv') then
+         return require('csv').load(pkgpath..'.csv')
+      elseif paths.filep(pkgpath..'.so') then
          return package.loadlib(pkgpath..'.so', 'luaopen_'..path.basename(name))()
-      elseif path.isfile(pkgpath..'.dylib') then
+      elseif paths.filep(pkgpath..'.dylib') then
          return package.loadlib(pkgpath..'.dylib', 'luaopen_'..path.basename(name))()
       else
-         local initpath = path.join(pkgpath,'init.lua')
+         local initpath = paths.concat(pkgpath,'init.lua')
          return dofile(initpath)
       end
    else
-      return drequire(name)
+      local ok,res = pcall(drequire,name)
+      if not ok then
+         local ok2,res2 = pcall(require,'./'..name)
+         if not ok2 then
+            error(res)
+         end
+         return res2
+      end
+      return res
    end
 end
 
@@ -422,274 +457,41 @@ local aliases = [[
 -- Penlight
 pcall(require,'pl')
 
+-- Useful globally, from penlight
+if text then
+   text.format_operator()
+end
+
 -- Reults:
 _RESULTS = {}
 _LAST = ''
 
 -- Readline:
-local readline_ok,readline = pcall(require,"trepl.readline")
-if not readline_ok then
-   print(col.red('WARNING: ') .. 'could not find/load readline, defaulting to linenoise')
-end
-
--- REPL:
-function repl_readline()
-   -- Completer:
-   local completer = require 'trepl.completer'
-   completer.final_char_setter = readline.completion_append_character
-
-   local inputrc = paths.concat(os.getenv('HOME'),'.inputrc')
-   if not paths.filep(inputrc) then
-      local finputrc = io.open(inputrc,'w')
-      local trepl =
-[[
-$if lua
-   # filter up and down arrows using characters typed so far
-   "\e[A":history-search-backward
-   "\e[B":history-search-forward
-$endif
-]]
-      finputrc:write(trepl)
-      finputrc:close()
-   end
-
-   -- Timer
-   local timer_start, timer_stop
-   if torch and torch.Timer then
-      local t = torch.Timer()
-      local start = 0
-      timer_start = function()
-         start = t:time().real
-      end
-      timer_stop = function()
-         local step = t:time().real - start
-         for i = 1,70 do io.write(' ') end
-         print(col.Black(string.format('[%0.04fs]', step)))
-      end
-   else
-      timer_start = function() end
-      timer_stop = function() end
-   end
-
-   -- History:
+local readline_ok,readline = pcall(require,'readline')
+local nextline,saveline
+if readline_ok then
+   -- Readline found:
    local history = os.getenv('HOME') .. '/.luahistory'
-
-   -- Readline callback:
-   readline.shell{
-      -- History:
-      history = history,
-
-      -- Completer:
-      complete = completer.complete,
-
-      -- Chars:
-      word_break_characters = " \t\n\"\\'><=;:+-*/%^~#{}()[].,",
-
-      -- Get command:
-      getcommand = function()
-         -- get the first line
-         local line = coroutine.yield(prompt())
-         local cmd = line .. '\n'
-
-         -- = (lua supports that)
-         if cmd:sub(1,1) == "=" then
-            cmd = "return "..cmd:sub(2)
-         end
-
-         -- Interupt?
-         if line == 'exit' then
-            io.stdout:write('Do you really want to exit ([y]/n)? ') io.flush()
-            local line = io.read('*l')
-            if line == '' or line:lower() == 'y' then
-               os.exit()
-            end
-         end
-
-         -- OS Commands:
-         if line and line:find('^%s-%$') then
-            local cline = line:gsub('^%s-%$','')
-            if io.popen then
-               local f = io.popen(aliases .. ' ' .. cline)
-               local res = f:read('*a')
-               f:close()
-               io.write(col.none(res)) io.flush()
-               table.insert(_RESULTS, res)
-               _LAST = _RESULTS[#_RESULTS]
-            else
-               os.execute(aliases .. ' ' .. cline)
-            end
-            timer_stop()
-            return line
-         end
-
-         -- Shortcut to get help:
-         if line and line:find('^%s-?') then
-            local ok = pcall(require,'dok')
-            if ok then
-               local pkg = line:gsub('^%s-?','')
-               if pkg:gsub('%s*','') == '' then
-                  print(selfhelp)
-                  return
-               else
-                  line = 'help(' .. pkg .. ')'
-               end
-            else
-               print('error: could not load help backend')
-               return line
-            end
-         end
-
-         -- try to return first:
-         timer_start()
-         local pok,ok,err
-         if line:find(';%s-$') or line:find('^%s-print') then
-            ok = false
-         elseif line:match('^%s*$') then
-            return nil
-         else
-            local func, perr = loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])')
-            if func then
-               pok = true
-               ok,err = xpcall(func, traceback)
-            end
-         end
-
-         -- run ok:
-         if ok then
-            _LAST = _RESULTS[#_RESULTS]
-            timer_stop()
-            return line
-         end
-
-         -- parsed ok, but failed to run (code error):
-         if pok then
-            print(err)
-            return cmd:sub(1, -2)
-         end
-
-         -- continue to get lines until get a complete chunk
-         local func, err
-         while true do
-            -- if not go ahead:
-            func, err = loadstring(cmd)
-            if func or err:sub(-7) ~= "'<eof>'" then break end
-
-            -- concat:
-            cmd = cmd .. coroutine.yield(prompt(true)) .. '\n'
-         end
-
-         -- exec chunk:
-         if not cmd:match("^%s*$") then
-            local ff,err=loadstring(cmd)
-            if not ff then
-               print(err)
-               return cmd:sub(1, -2)
-            end
-            local res = {xpcall(ff, traceback)}
-            local ok,err = res[1], res[2]
-            if not ok then
-               print(err)
-            else
-               if err ~= nil then
-                  table.remove(res,1)
-                  print(unpack(res))
-               end
-            end
-            timer_stop()
-            return cmd:sub(1, -2) -- remove last \n for history
-         end
-      end,
-   }
-   io.stderr:write"\n"
-end
-
--- No readline -> LineNoise?
-local nextline
-if not readline_ok then
-   -- Load linenoise:
-   local ok,L = pcall(require,'linenoise')
-   ok = false
-   if not ok then
-      -- No readline, no linenoise... default to plain io:
-      nextline = function()
-         io.write(prompt()) io.flush()
-         return io.read('*line')
-      end
-
-      -- Really poor:
-      print(col.red('WARNING: ') .. 'could not find/load linenoise, defaulting to raw repl')
-   else
-      -- History:
-      local history = os.getenv('HOME') .. '/.luahistory'
-      L.historyload(history)
-
-      -- Completion:
-      L.setcompletion(function(c,s)
-         -- Check if we're in a string
-         local ignore,str = s:gfind('(.-)"([a-zA-Z%._]*)$')()
-         local quote = '"'
-         if not str then
-            ignore,str = s:gfind('(.-)\'([a-zA-Z%._]*)$')()
-            quote = "'"
-         end
-
-         -- String?
-         if str then
-            -- Complete from disk:
-            local f = io.popen('ls ' .. str..'* 2> /dev/null')
-            local res = f:read('*all')
-            f:close()
-            res = res:gsub('(%s*)$','')
-            local elts = stringx.split(res,'\n')
-            for _,elt in ipairs(elts) do
-               L.addcompletion(c,ignore .. quote .. elt)
-            end
-            return
-         end
-
-         -- Get symbol of interest
-         local ignore,str = s:gfind('(.-)([a-zA-Z%._]*)$')()
-
-         -- Lookup globals:
-         if not str:find('%.') then
-            for k,v in pairs(_G) do
-               if k:find('^'..str) then
-                  L.addcompletion(c,ignore .. k)
-               end
-            end
-         end
-
-         -- Lookup packages:
-         local base,sub = str:gfind('(.*)%.(.*)')()
-         if base then
-            local ok,res = pcall(loadstring('return ' .. base))
-            for k,v in pairs(res) do
-               if k:find('^'..sub) then
-                  L.addcompletion(c,ignore .. base .. '.' .. k)
-               end
-            end
-         end
-      end)
-
-      -- read line:
-      nextline = function()
-         -- Get line:
-         local line = L.linenoise(prompt())
-
-         -- Save:
-         if line and not line:find('^%s-$') then
-            L.historyadd(line)
-            L.historysave(history)
-         end
-
-         -- Return line:
-         return line
-      end
+   readline.setup()
+   readline.read_history(history)
+   nextline = function(aux)
+      return readline.readline(prompt(aux))
    end
+   saveline = function(line)
+      readline.add_history(line)
+      readline.write_history(history)
+   end
+else
+   -- No readline... default to plain io:
+   nextline = function(aux)
+      io.write(prompt(aux)) io.flush()
+      return io.read('*line')
+   end
+   saveline = function() end
 end
 
--- The default repl
-function repl_linenoise()
+-- The repl
+function repl()
    -- Timer
    local timer_start, timer_stop
    if torch and torch.Timer then
@@ -758,6 +560,18 @@ function repl_linenoise()
 
       -- EVAL:
       if line then
+         -- Try to load line first, for multiline support:
+         local valid = loadstring('return ' .. line) or loadstring(line)
+         while not valid do
+            local nline = nextline(true)
+            if nline == '' or not nline then
+               break
+            end
+            line = line .. '\n' .. nline
+            valid = loadstring(line)
+         end
+
+         -- Execute:
          timer_start()
          local ok,err
          if line:find(';%s-$') or line:find('^%s-print') then
@@ -766,9 +580,14 @@ function repl_linenoise()
             ok,err = xpcall(loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])'), traceback)
          end
          if not ok then
-            local ok,err = xpcall(loadstring(line), traceback)
-            if not ok then
-               print(err)
+            local parsed,perr = loadstring(line) 
+            if not parsed then
+               print('syntax error: ' .. perr)
+            else
+               local ok,err = xpcall(parsed, traceback)
+               if not ok then
+                  print(err)
+               end
             end
          end
          timer_stop()
@@ -776,6 +595,9 @@ function repl_linenoise()
 
       -- Last result:
       _LAST = _RESULTS[#_RESULTS]
+
+      -- Save:
+      saveline(line)
    end
 end
 
@@ -786,4 +608,4 @@ for k,v in pairs(_G) do
 end
 
 -- return repl, just call it to start it!
-return (readline_ok and repl_readline) or repl_linenoise
+return repl

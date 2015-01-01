@@ -17,9 +17,7 @@ An embedabble, Lua-only REPL for Torch.
 
 dependencies = {
    "torch >= 7.0",
-   "linenoise >= 0.4",
    "penlight >= 1.1.0",
-   "luafilesystem >= 1.6.2"
 }
 
 build = {
@@ -28,8 +26,10 @@ build = {
       ['trepl.init'] = 'init.lua',
       ['trepl.colors'] = 'colors.lua',
       ['trepl.colorize'] = 'colorize.lua',
-      ['trepl.readline'] = 'readline.lua',
-      ['trepl.completer'] = 'completer.lua',
+      ['readline'] = {
+         sources = {'readline.c'},
+         libraries = {'readline'}
+      }
    },
    install = {
       bin = {
