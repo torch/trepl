@@ -13,12 +13,7 @@ th>
 
 A pure Lua REPL for LuaJIT, with heavy support for Torch types. 
 
-Uses Readline for tab completion, with code borrowed from
-[iluajit](https://github.com/jdesgats/ILuaJIT).
-
-If Readline is not found, it defaults to using
-[Linenoise](https://github.com/hoelzro/lua-linenoise),
-which is significantly more simplistic.
+Uses Readline for tab completion.
 
 This package installs a new binary named `th`, which
 comes packed with all these features:

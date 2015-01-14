@@ -4,9 +4,6 @@
    This REPL is embeddable, and doesn't depend on C libraries.
    It's usable with Torch, and with MOAI.
 
-   For full completion support, and history, install lua-linenoise:
-   $ luarocks install linenoise
-
    Support for SHELL commands:
    > $ ls
    > $ ll
