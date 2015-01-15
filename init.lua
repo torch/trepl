@@ -109,7 +109,11 @@ local function printvar(key,val,m)
          tp = tostring(val)
       end
    elseif tp == 'table' then
-      tp = tp .. ' - size: ' .. #val
+      if torch.type(val) == 'table' then
+	 tp = tp .. ' - size: ' .. #val
+      else 
+	 tp = torch.type(val)
+      end
    elseif tp == 'string' then
       local tostr = val:gsub('\n','\\n')
       if #tostr>40 then
