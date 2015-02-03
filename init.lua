@@ -2,7 +2,7 @@
    REPL: A REPL for Lua (with support for Torch objects).
 
    This REPL is embeddable, and doesn't depend on C libraries.
-   It's usable with Torch, and with MOAI.
+   If readline.so is built and found at runtime, then tab-completion is enabled.
 
    Support for SHELL commands:
    > $ ls
@@ -572,16 +572,26 @@ function repl()
             valid = loadstring(line)
          end
 
-         -- Execute:
+         -- Execute, first by trying to auto return result:
          timer_start()
-         local ok,err
-         if line:find(';%s-$') or line:find('^%s-print') then
-            ok = false
-         else
-            ok,err = xpcall(loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])'), traceback)
+         local done = false
+         local err
+         if not (line:find(';%s-$') or line:find('^%s-print')) then
+            -- Try to compile statement with "return", to auto-print
+            local parsed = loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])')
+            if parsed then
+               local ok,err = xpcall(parsed, traceback)
+               if not ok then
+                  print(err)
+               end
+               done = true
+            end
          end
-         if not ok then
-            local parsed,perr = loadstring(line) 
+
+         -- If not done executing, execute normally:
+         if not done then
+            -- We only get here if statement could not be printed/returned
+            local parsed,perr = loadstring(line)
             if not parsed then
                print('syntax error: ' .. perr)
             else
