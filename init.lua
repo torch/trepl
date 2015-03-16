@@ -42,50 +42,62 @@ local selfhelp =  [[
 
 ]]..col.red('th')..[[ is an enhanced interpreter (repl) for Torch7/Lua.
 
-]]..col.blue('Features:')..[[
+]]..col.blue('Features:')..[[ 
 
    Tab-completion on nested namespaces
    Tab-completion on disk files (when opening a string)
    History stored in:
 
-      ]]..col.magenta("_RESULTS")..[[
-      ]]..col.magenta("_LAST")..[[
+      ]]..col.magenta("_RESULTS")..[[ 
+      ]]..col.magenta("_LAST")..[[ 
 
    Pretty print (table introspection and coloring)
-   Auto-print after eval (no need for '='), can be stopped with ]]..col.magenta(";")..[[
+   Auto-print after eval (no need for '='), can be stopped with ]]..col.magenta(";")..[[ 
    Each command is profiled, timing is reported
    Easy help on functions/packages:
 
-      ]]..col.magenta("? torch.randn")..[[
+      ]]..col.magenta("? torch.randn")..[[ 
 
    Documentation browsable with:
 
-      ]]..col.magenta("browse()")..[[
-      ]]..col.magenta("browse(package)")..[[
+      ]]..col.magenta("browse()")..[[ 
+      ]]..col.magenta("browse(package)")..[[ 
 
    Shell commands with:
 
-      ]]..col.magenta("$ ls -l")..[[
+      ]]..col.magenta("$ ls -l")..[[ 
+
+   and the string result can be retrieved with:
+
+      ]]..col.magenta("_LAST")..[[ 
 
    Print all user globals with:
 
-      ]]..col.magenta("who()")..[[
+      ]]..col.magenta("who()")..[[ 
+
+   Clear screen with:
+
+      ]]..col.magenta("<Ctrl> L")..[[ 
+
+   Quit Torch7 with:
+
+      ]]..col.magenta("<Ctrl> D")..[[ 
 
    Import a package's symbols globally with:
 
-      ]]..col.magenta("import 'torch'")..[[
+      ]]..col.magenta("import 'torch'")..[[ 
 
    Require is overloaded to provide relative (form within a file) search paths:
 
-      ]]..col.magenta("require './local/lib' ")..[[
+      ]]..col.magenta("require './local/lib' ")..[[ 
 
    Optional strict global namespace monitoring:
 
-      ]]..col.magenta('th -g')..[[
+      ]]..col.magenta('th -g')..[[ 
 
    Optional async repl (based on https://github.com/clementfarabet/async):
 
-      ]]..col.magenta('th -a')..[[
+      ]]..col.magenta('th -a')..[[ 
 ]]
 
 -- If no Torch:
@@ -134,7 +146,7 @@ local function printvar(key,val,m)
    elseif tp == 'table' then
       if torch.type(val) == 'table' then
 	 tp = tp .. ' - size: ' .. #val
-      else 
+      else
 	 tp = torch.type(val)
       end
    elseif tp == 'string' then
