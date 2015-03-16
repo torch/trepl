@@ -552,7 +552,10 @@ function repl()
 
       -- Shortcut to get help:
       if line and line:find('^%s-?') then
-         if dok_loaded_ok then
+	 if line:gsub('^%s-?','') == '' then
+	    print(selfhelp)
+	    line = nil
+	 elseif dok_loaded_ok then
             line = 'help(' .. line:gsub('^%s-?','') .. ')'
          else
             print('error: could not load help backend')
