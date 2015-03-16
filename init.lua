@@ -46,25 +46,46 @@ local selfhelp =  [[
 
    Tab-completion on nested namespaces
    Tab-completion on disk files (when opening a string)
-   History
+   History stored in:
+
+      ]]..col.magenta("_RESULTS")..[[
+      ]]..col.magenta("_LAST")..[[
+
    Pretty print (table introspection and coloring)
-   Auto-print after eval (can be stopped with ;)
+   Auto-print after eval (no need for '='), can be stopped with ]]..col.magenta(";")..[[
    Each command is profiled, timing is reported
-   No need for '=' to print
    Easy help on functions/packages:
-   ]]..col.magenta("? torch.randn")..[[
+
+      ]]..col.magenta("? torch.randn")..[[
+
+   Documentation browsable with:
+
+      ]]..col.magenta("browse()")..[[
+      ]]..col.magenta("browse(package)")..[[
+
    Shell commands with:
-   ]]..col.magenta("$ ls -l")..[[
+
+      ]]..col.magenta("$ ls -l")..[[
+
    Print all user globals with:
-   ]]..col.magenta("who()")..[[
+
+      ]]..col.magenta("who()")..[[
+
    Import a package's symbols globally with:
-   ]]..col.magenta("import 'torch' ")..[[
+
+      ]]..col.magenta("import 'torch'")..[[
+
    Require is overloaded to provide relative (form within a file) search paths:
-   ]]..col.magenta("require './local/lib' ")..[[
+
+      ]]..col.magenta("require './local/lib' ")..[[
+
    Optional strict global namespace monitoring:
-   ]]..col.magenta('th -g')..[[
+
+      ]]..col.magenta('th -g')..[[
+
    Optional async repl (based on https://github.com/clementfarabet/async):
-   ]]..col.magenta('th -a')..[[
+
+      ]]..col.magenta('th -a')..[[
 ]]
 
 -- If no Torch:
