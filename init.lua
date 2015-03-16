@@ -19,6 +19,8 @@ pcall(require,'torch')
 pcall(require,'paths')
 pcall(require,'sys')
 pcall(require,'xlua')
+local dok_loaded_ok = pcall(require,'dok')
+
 
 -- Colors:
 local colors = require 'trepl.colors'
@@ -550,8 +552,7 @@ function repl()
 
       -- Shortcut to get help:
       if line and line:find('^%s-?') then
-         local ok = pcall(require,'dok')
-         if ok then
+         if dok_loaded_ok then
             line = 'help(' .. line:gsub('^%s-?','') .. ')'
          else
             print('error: could not load help backend')
