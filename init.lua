@@ -615,10 +615,14 @@ function repl()
          local err
          if not (line:find(';%s-$') or line:find('^%s-print')) then
             -- Try to compile statement with "return", to auto-print
-            local parsed = loadstring('local f = function() return '..line..' end local res = {f()} print(unpack(res)) table.insert(_RESULTS,res[1])')
+            local parsed = loadstring('local f = function() return '..line..' end')
             if parsed then
-               local ok,err = xpcall(parsed, traceback)
-               if not ok then
+               local parsed = loadstring('_RESULT={'..line..'}')
+               local ok,err=xpcall(parsed, traceback)
+               if ok then
+                  print(unpack(_RESULT))
+                  table.insert(_RESULTS,_RESULT[1])
+               else
                   print(err)
                end
                done = true
