@@ -98,6 +98,11 @@ local selfhelp =  [[
    Optional async repl (based on https://github.com/clementfarabet/async):
 
       ]]..col.magenta('th -a')..[[ 
+
+   Using colors:
+
+      ]]..col.magenta("c = require 'trepl.colorize'")..[[ 
+      print(c.red(]]..col.red("'a red string'")..[[) .. c.blue(]]..col.blue("'a blue string'")..[[))
 ]]
 
 -- If no Torch:
