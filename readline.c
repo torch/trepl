@@ -7,6 +7,13 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#if LUA_VERSION_NUM == 501
+# define lua_pushglobaltable(L) lua_pushvalue(L, LUA_GLOBALSINDEX)
+# define luaL_setfuncs(L, libs, _) luaL_register(L, NULL, libs)
+#else
+# define lua_strlen lua_rawlen
+#endif
+
 /*
 ** Lua 5.1.4 advanced readline support for the GNU readline and history
 ** libraries or compatible replacements.
@@ -152,6 +159,19 @@ static int lua_rl_getfield(lua_State *L, const char *s, size_t n)
   return 0;
 }  /* 1: obj -- val, 0: obj -- */
 
+static int lua_rl_isglobaltable(lua_State *L, int idx)
+{
+#if LUA_VERSION_NUM == 501
+  return lua_rawequal(L, idx, LUA_GLOBALSINDEX);
+#else
+  idx = lua_absindex(L, idx);
+  lua_pushglobaltable(L);
+  int same = lua_rawequal(L, idx, -1);
+  lua_pop(L, 1);
+  return same;
+#endif
+}
+
 /* Completion callback. */
 static char **lua_rl_complete(const char *text, int start, int end)
 {
@@ -167,7 +187,7 @@ static char **lua_rl_complete(const char *text, int start, int end)
   ml.idx = ml.allocated = ml.matchlen = 0;
 
   savetop = lua_gettop(L);
-  lua_pushvalue(L, LUA_GLOBALSINDEX);
+  lua_pushglobaltable(L);
   for (n = (size_t)(end-start), i = dot = 0; i < n; i++)
     if (text[i] == '.' || text[i] == ':') {
       if (!lua_rl_getfield(L, text+dot, i-dot))
@@ -185,7 +205,7 @@ static char **lua_rl_complete(const char *text, int start, int end)
   loop = 0;  /* Avoid infinite metatable loops. */
   do {
     if (lua_istable(L, -1) &&
-  (loop == 0 || !lua_rawequal(L, -1, LUA_GLOBALSINDEX)))
+  (loop == 0 || !lua_rl_isglobaltable(L, -1)))
       for (lua_pushnil(L); lua_next(L, -2); lua_pop(L, 1))
   if (lua_type(L, -2) == LUA_TSTRING) {
     s = lua_tostring(L, -2);
@@ -279,7 +299,7 @@ static int f_read_history(lua_State* L)
   return 0;
 }
 
-static const struct luaL_reg lib[] = {
+static const struct luaL_Reg lib[] = {
   {"readline", f_readline},
   {"add_history",f_add_history},
   {"write_history",f_write_history},
@@ -289,6 +309,7 @@ static const struct luaL_reg lib[] = {
 };
 
 int luaopen_readline (lua_State *L) {
-  luaL_openlib (L, "readline", lib, 0);
+  lua_newtable(L);
+  luaL_setfuncs(L, lib, 0);
   return 1;
 }
