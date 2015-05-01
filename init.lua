@@ -26,6 +26,10 @@ local dok_loaded_ok = pcall(require,'dok')
 local colors = require 'trepl.colors'
 local col = require 'trepl.colorize'
 
+-- Lua 5.2 compatibility
+local loadstring = loadstring or load
+local unpack = unpack or table.unpack
+
 -- Kill colors:
 function noColors()
    for k,v in pairs(colors) do
