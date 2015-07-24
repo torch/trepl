@@ -516,7 +516,7 @@ local readline_ok,readline = pcall(require,'readline')
 local nextline,saveline
 if readline_ok then
    -- Readline found:
-   local history = os.getenv('HOME') .. '/.luahistory'
+   local history = (os.getenv('HOME') or os.getenv('USERPROFILE')) .. '/.luahistory'
    readline.setup()
    readline.read_history(history)
    nextline = function(aux)
