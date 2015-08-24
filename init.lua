@@ -562,9 +562,14 @@ function repl()
 
       -- Interupt?
       if not line or line == 'exit' then
-         io.write('Do you really want to exit ([y]/n)? ') io.flush()
-         local line = io.read('*l')
-         if line == '' or line:lower() == 'y' then
+         local input = ''
+         if not path.isfile(paths.home .. '/.trepl_noaskexit') then
+            io.write('Do you really want to exit ([y]/n)? ') io.flush()
+            input = io.read('*l')
+         elseif line == nil then
+            io.write('\n') io.flush()
+         end
+         if input == '' or input:lower() == 'y' then
             os.exit()
          end
       end
