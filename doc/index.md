@@ -13,7 +13,12 @@ th>
 A pure Lua [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) 
 for LuaJIT, with heavy support for Torch types. 
 
-Uses Readline for tab completion.
+Uses Readline for tab completion, with code borrowed from
+[iluajit](https://github.com/jdesgats/ILuaJIT).
+
+If Readline is not found, it defaults to using
+[Linenoise](https://github.com/hoelzro/lua-linenoise),
+which is significantly more simplistic.
 
 This package installs a new binary named `th`, which
 comes packed with all these features:
@@ -189,4 +194,3 @@ will be printed every second - step #3
 will be printed every second - step #20
 will be printed every second - step #21
 ```
-
