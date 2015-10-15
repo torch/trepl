@@ -1,5 +1,7 @@
 #!/usr/bin/env luajit
 
+loadstring = loadstring or load -- for lua 5.2 compat
+
 -- help
 local help = [==[
 Usage: th [options] [script.lua [arguments]]
