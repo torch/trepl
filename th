@@ -52,7 +52,7 @@ for _,arg in ipairs(parg) do
          -- help
          if shortopt == 'h' or option == 'help' then
             print(help)
-            os.exit()
+	    return
          elseif shortopt == 'i' or option == 'interactive' then
             interactive = true
          elseif shortopt == 'e' then
@@ -73,7 +73,7 @@ for _,arg in ipairs(parg) do
             -- unknown
             print('Error: unrecognized flag --' .. option)
             print(help)
-            os.exit()
+	    return
          end
       else
          -- exec program
@@ -119,10 +119,10 @@ if statement then
    local ok,res = pcall(s)
    if not ok then
       print(res)
-      os.exit()
+      return
    end
    -- quit by default
-   if not interactive then os.exit() end
+   if not interactive then return end
 end
 
 -- run program
@@ -132,7 +132,7 @@ if run then
    -- run
    dofile(run)
    -- quit by default
-   if not interactive then os.exit() end
+   if not interactive then return end
 end
 
 -- start repl
