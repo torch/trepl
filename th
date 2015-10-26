@@ -71,7 +71,7 @@ for _,arg in ipairs(parg) do
             nextarg = 'lib'
          else
             -- unknown
-            print('Error: unrecognized flag --' .. option)
+            print('Error: unrecognized flag --' .. (option ~= nil and option or shortopt))
             print(help)
 	    return
          end
