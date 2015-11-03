@@ -2,6 +2,17 @@
 
 loadstring = loadstring or load -- for lua 5.2 compat
 
+-- Tracekback (error printout)
+local function traceback(message)
+   local tp = type(message)
+   if tp ~= "string" and tp ~= "number" then return message end
+   local debug = _G.debug
+   if type(debug) ~= "table" then return message end
+   local tb = debug.traceback
+   if type(tb) ~= "function" then return message end
+   return tb(message)
+end
+
 -- help
 local help = [==[
 Usage: th [options] [script.lua [arguments]]
@@ -34,9 +45,10 @@ for _,arg in ipairs(parg) do
    end
    -- load libraries
    if lib then
-      local ok = pcall(require,lib)
+      local ok, err = xpcall(function() require(lib) end, traceback)
       if not ok then
          print('could not load ' .. lib .. ', skipping')
+	 print(err)
       end
    elseif progargs then
       -- program args
