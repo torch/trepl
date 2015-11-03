@@ -29,6 +29,9 @@ build = {
       ['readline'] = {
          sources = {'readline.c'},
          libraries = {'readline'}
+      },
+      ['treplutils'] = {
+         sources = {'utils.c'},
       }
    },
    platforms = {
