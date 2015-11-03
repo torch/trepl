@@ -37,6 +37,21 @@ function noColors()
    end
 end
 
+local cutils = require 'treplutils'
+
+-- best effort isWindows. Not robust
+local function isWindows()
+   return type(package) == 'table' and
+      type(package.config) == 'string' and
+      package.config:sub(1,1) == '\\'
+end
+
+if isWindows()
+   or (not cutils.isatty())
+or (os.execute('tput colors >/dev/null') ~= 0) then
+   noColors()
+end
+
 -- Help string:
 local selfhelp =  [[
   ______             __

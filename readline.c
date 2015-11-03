@@ -6,6 +6,7 @@
 #include "lualib.h"
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <ctype.h>
 
 #if LUA_VERSION_NUM == 501
 # define lua_pushglobaltable(L) lua_pushvalue(L, LUA_GLOBALSINDEX)
