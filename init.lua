@@ -46,10 +46,15 @@ local function isWindows()
       package.config:sub(1,1) == '\\'
 end
 
-if isWindows()
-   or (not cutils.isatty())
-or (os.execute('tput colors >/dev/null') ~= 0) then
+if isWindows() or (not cutils.isatty()) then
    noColors()
+else
+   local outp = os.execute('tput colors >/dev/null')
+   if type(outp) == 'boolean' and not outp then
+      noColors()
+   elseif type(outp) == 'number' and outp ~= 0 then
+      noColors()
+   end
 end
 
 -- Help string:
