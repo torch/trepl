@@ -688,5 +688,8 @@ for k,v in pairs(_G) do
    _G._preloaded_[k] = true
 end
 
+-- Enable heap tracking
+torch.setheaptracking(true)
+
 -- return repl, just call it to start it!
 return repl
