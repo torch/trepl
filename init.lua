@@ -132,7 +132,8 @@ local selfhelp =  [[
 -- If no Torch:
 if not torch then
    torch = {
-      typename = function() return '' end
+      typename = function() return '' end,
+      setheaptracking = function() end
    }
 end
 
