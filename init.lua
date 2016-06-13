@@ -586,6 +586,7 @@ function repl()
          io.write('Do you really want to exit ([y]/n)? ') io.flush()
          local line = io.read('*l')
          if not line or line == '' or line:lower() == 'y' then
+            if not line then print('') end
             os.exit()
          end
       end
