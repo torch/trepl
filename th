@@ -147,6 +147,50 @@ if run then
    if not interactive then return end
 end
 
+-- list torch modules available
+function list_torch_modules()
+   local c = require 'trepl.colorize'
+   print(c.white'Available Torch Modules:')
+   local modules = { -- in alphabet order
+      -- core part, 15 packages
+      'cunn',
+      'cutorch',
+      'cwrap',
+      'dok',
+      'graph',
+      'image',
+      'optim',
+      'paths',
+      'nn',
+      'nngraph',
+      'sundown',
+      'sys',
+      'torch',
+      'trepl',
+      'xlua',
+      -- optional part
+      'audio',
+      'argcheck',
+      'cudnn',
+      'cunnx',
+      'env',
+      'fftw3',
+      'gnuplot',
+      'graphicsmagick',
+      'nnx',
+      'qtlua',
+      'qttorch',
+      'signal',
+      'threads',
+   }
+   for _, each in pairs(modules) do
+      local res = package.searchpath(each, package.path)
+      if not res then res = package.searchpath(each, package.cpath) end
+      if res then io.write(' '..c.magenta(each)) end
+   end
+   print('') -- final new line
+end
+
 -- start repl
 if asyncrepl then
    -- verbose
@@ -186,6 +230,8 @@ else
                           ]]..col.Black[[|  ]]..col.blue[[http://torch.ch                 ]]..[[ 
 ]]
 )
+   -- list torch modules available
+   list_torch_modules()
 
    -- globs?
    if globs then
