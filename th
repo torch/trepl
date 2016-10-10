@@ -153,11 +153,11 @@ if asyncrepl then
    print(
 [[
  
-  ______             __   ]]..col.Black[[|  Torch7                                        ]]..[[ 
+  ______             __   ]]..col.Black[[|  Torch7]]..[[ 
  /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for Lua.]]..[[ 
-  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|  Type ? for help                               ]]..[[ 
- /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch        ]]..[[ 
-                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch                 ]]..[[ 
+  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|  Type ? for help]]..[[ 
+ /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch]]..[[ 
+                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch]]..[[ 
  
 ]] .. col.red('WARNING: ') .. col.Black('you are running an experimental asynchronous interpreter for Torch.') .. [[ 
 ]] .. col.Black('Note 1: It has no support for readline/completion yet.') .. [[ 
@@ -179,11 +179,11 @@ else
    print(
 [[
  
-  ______             __   ]]..col.Black[[|  Torch7                                        ]]..[[ 
+  ______             __   ]]..col.Black[[|  Torch7]]..[[ 
  /_  __/__  ________/ /   ]]..col.Black[[|  ]]..col.magenta[[Scientific computing for Lua.]]..[[ 
-  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|  Type ? for help                               ]]..[[ 
- /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch        ]]..[[ 
-                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch                 ]]..[[ 
+  / / / _ \/ __/ __/ _ \  ]]..col.Black[[|  Type ? for help]]..[[ 
+ /_/  \___/_/  \__/_//_/  ]]..col.Black[[|  ]]..col.blue[[https://github.com/torch]]..[[ 
+                          ]]..col.Black[[|  ]]..col.blue[[http://torch.ch]]..[[ 
 ]]
 )
 
