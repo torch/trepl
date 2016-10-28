@@ -4,8 +4,12 @@
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
+#ifndef WinEditLine
 #include <readline/readline.h>
 #include <readline/history.h>
+#else
+#include <editline/readline.h>
+#endif
 #include <ctype.h>
 
 #if LUA_VERSION_NUM == 501
@@ -260,12 +264,16 @@ static int f_setup(lua_State *L)
   /* Break words at every non-identifier character except '.' and ':'. */
   rl_completer_word_break_characters =
     "\t\r\n !\"#$%&'()*+,-/;<=>?@[\\]^`{|}~";
+#ifndef WinEditLine
   rl_completer_quote_characters = "\"'";
+#endif
 /* #if RL_READLINE_VERSION < 0x0600 */
   rl_completion_append_character = '\0';
 /* #endif */
   rl_attempted_completion_function = lua_rl_complete;
+#ifndef WinEditLine
   rl_initialize();
+#endif
 
   return 0;
 }
