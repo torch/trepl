@@ -40,10 +40,10 @@ build = {
 		    ['readline'] = {
                sources = {'readline.c'},
                libraries = {'readline'},
-			   defines = {"USE_READLINE_STATIC"},
-               incdirs = {"windows"},
-               libdirs = {"windows"},
-               libraries = {'readline-win'}
+               defines = {"WinEditLine"},
+               incdirs = {"..\\..\\win-files\\3rd\\wineditline-2.101\\include"},
+               libdirs = {"..\\..\\win-files\\3rd\\wineditline-2.101\\lib64"},
+               libraries = {'edit_static', 'user32'}
 			}
 		 }
 	  }

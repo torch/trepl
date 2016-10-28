@@ -46,10 +46,15 @@ local function isWindows()
       package.config:sub(1,1) == '\\'
 end
 
-if isWindows() or (not cutils.isatty()) then
+local hasTPut = true -- default true for non windows
+if isWindows() then
+  hasTPut = sys.fexecute('where tput'):find('tput')
+end
+
+if not hasTPut or not cutils.isatty() then
    noColors()
 else
-   local outp = os.execute('tput colors >/dev/null')
+   local outp = os.execute('tput colors >' .. (isWindows() and 'NUL' or '/dev/null'))
    if type(outp) == 'boolean' and not outp then
       noColors()
    elseif type(outp) == 'number' and outp ~= 0 then
@@ -519,6 +524,10 @@ local aliases = [[
    alias la='ls -ahF';
    alias lla='ls -lahF';
 ]]
+
+if isWindows() then
+   aliases = ""
+end
 
 -- Penlight
 pcall(require,'pl')

@@ -13,7 +13,7 @@
 
 int treplutils_isatty(lua_State *L)
 {
-  lua_pushboolean(L, 0);
+  lua_pushboolean(L, _isatty(1));
   return 1;
 }
 
