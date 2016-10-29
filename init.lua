@@ -479,13 +479,13 @@ function monitor_G(cb)
                report = error
             end
             if line > 0 then
-               report(colors.red .. 'atempt to read undeclared variable: '
+               report(colors.red .. 'attempt to read undeclared variable: '
                   .. colors.blue .. key .. colors.none
                   .. ' @ ' .. colors.magenta .. file .. colors.none
                   .. ':' .. colors.green .. line .. colors.none
                )
             else
-               report(colors.red .. 'atempt to read undeclared variable: '
+               report(colors.red .. 'attempt to read undeclared variable: '
                   .. colors.blue .. key .. colors.none
                   .. ' @ ' .. colors.yellow .. '[C-module]' .. colors.none
                )
