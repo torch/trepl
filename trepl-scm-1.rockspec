@@ -35,6 +35,14 @@ build = {
       }
    },
    platforms = {
+      freebsd = {
+             modules = {
+                  ['readline'] = {
+                    incdirs = {'/usr/local/include'},
+                    libdirs = {'/usr/local/lib'}
+                  }
+             }
+      },
       windows = {
 	     modules = {
 		    ['readline'] = {
