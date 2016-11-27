@@ -49,8 +49,8 @@ build = {
                sources = {'readline.c'},
                libraries = {'readline'},
                defines = {"WinEditLine"},
-               incdirs = {"..\\..\\win-files\\3rd\\wineditline-2.101\\include"},
-               libdirs = {"..\\..\\win-files\\3rd\\wineditline-2.101\\lib64"},
+               incdirs = {"..\\..\\win-files\\3rd\\wineditline-2.201\\include"},
+               libdirs = {"..\\..\\win-files\\3rd\\wineditline-2.201\\lib64"},
                libraries = {'edit_static', 'user32'}
 			}
 		 }
