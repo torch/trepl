@@ -104,6 +104,11 @@ end
 local repl = require 'trepl'
 local col = require 'trepl.colorize'
 
+-- load startup file
+if os.getenv('TREPLSTARTUP') and not (interactive or statement) then
+    dofile(os.getenv('TREPLSTARTUP'))
+end
+
 -- load gfx env?
 if lgfx then
    local ok = pcall(require, 'gfx.js')
