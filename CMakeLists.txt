@@ -57,4 +57,4 @@ INSTALL(FILES ${luasrc} DESTINATION ${LUADIR}/trepl)
 # Install compiled C libraries
 INSTALL(TARGETS trepl LIBRARY DESTINATION ${LUA_LIBDIR} )
 # Install cli script
-INSTALL(FILES ${scriptsrc} DESTINATION ${LUA_BINDIR})
+INSTALL(PROGRAMS ${scriptsrc} DESTINATION ${LUA_BINDIR})
