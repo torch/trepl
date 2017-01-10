@@ -17,10 +17,11 @@ IF (UNIX OR NOT WIN32)
   CHECK_INCLUDE_FILES(stdlib.h HAVE_STDLIB_H)
 ENDIF (UNIX OR NOT WIN32)
 
+CONFIGURE_FILE("utils.c" "${CMAKE_CURRENT_BINARY_DIR}/treplutils")
 # C source files
 SET(src 
   "${CMAKE_CURRENT_SOURCE_DIR}/readline.c"
-  "${CMAKE_CURRENT_SOURCE_DIR}/utils.c" )
+  "${CMAKE_CURRENT_SOURCE_DIR}/treplutils.c" )
 
 # LUA source files
 SET(luasrc 
@@ -38,11 +39,12 @@ IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE=1)
 ENDIF(MSVC)
 
-ADD_LIBRARY("trepl" MODULE ${src})
+ADD_LIBRARY("trepl" SHARED ${src})
 
+# OUTPUT_NAME "treplutils"
 # We would like to rename util.c to treputils.so after compilation and without prefix lib
 SET_TARGET_PROPERTIES("trepl" PROPERTIES
-  OUTPUT_NAME "treplutils"
+  
   PREFIX ""
   IMPORT_PREFIX "lib" )
 
