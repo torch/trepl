@@ -40,10 +40,10 @@ ENDIF(MSVC)
 
 ADD_LIBRARY("trepl" MODULE ${src})
 
-# We would like to rename util.c to treputils.so after compilation
+# We would like to rename util.c to treputils.so after compilation and without prefix lib
 SET_TARGET_PROPERTIES("trepl" PROPERTIES
   OUTPUT_NAME "treputils"
-  PREFIX "lib"
+  PREFIX ""
   IMPORT_PREFIX "lib" )
 
 # Apple related stuff
