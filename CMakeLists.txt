@@ -28,8 +28,8 @@ SET(luasrc
   "${CMAKE_CURRENT_SOURCE_DIR}/colorize.lua"
   "${CMAKE_CURRENT_SOURCE_DIR}/colors.lua" )
 
-# Th binary file
-SET(trepl-exe
+# Th executable script -> CLI for Torch
+SET(scriptsrc
     "${CMAKE_CURRENT_SOURCE_DIR}/th")
 
 # When using MSVC
@@ -54,14 +54,7 @@ ENDIF()
 
 # Install LUA source files
 INSTALL(FILES ${luasrc} DESTINATION ${LUADIR}/trepl)
-
-INSTALL(TARGETS trepl
-  LIBRARY DESTINATION ${LUA_LIBDIR} )
-
-# TODO
-#IF(LUALIB)
-#  TARGET_LINK_LIBRARIES(trepl ${LUALIB})
-#ENDIF()
-
-# Copy included "binary" executable for trepl
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/th ${CMAKE_CURRENT_BINARY_DIR}/th COPYONLY)
+# Install compiled C libraries
+INSTALL(TARGETS trepl LIBRARY DESTINATION ${LUA_LIBDIR} )
+# Install cli script
+INSTALL(FILES ${scriptsrc} DESTINATION ${LUA_BINDIR})
