@@ -42,7 +42,7 @@ ADD_LIBRARY("trepl" MODULE ${src})
 
 # We would like to rename util.c to treputils.so after compilation and without prefix lib
 SET_TARGET_PROPERTIES("trepl" PROPERTIES
-  OUTPUT_NAME "treputils"
+  OUTPUT_NAME "treplutils"
   PREFIX ""
   IMPORT_PREFIX "lib" )
 
