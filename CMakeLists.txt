@@ -19,7 +19,7 @@ IF (UNIX OR NOT WIN32)
   CHECK_INCLUDE_FILES(stdlib.h HAVE_STDLIB_H)
 ENDIF (UNIX OR NOT WIN32)
 
-CONFIGURE_FILE("utils.c" "${CMAKE_CURRENT_BINARY_DIR}/treplutils")
+CONFIGURE_FILE("utils.c" "${CMAKE_CURRENT_SOURCE_DIR}/treplutils.c")
 # C source files
 SET(src 
   "${CMAKE_CURRENT_SOURCE_DIR}/readline.c"
