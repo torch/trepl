@@ -41,18 +41,17 @@ IF(MSVC)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE=1)
 ENDIF(MSVC)
 
-ADD_LIBRARY("trepl" SHARED ${src})
+ADD_LIBRARY("treplutils" SHARED ${src})
 
 # OUTPUT_NAME "treplutils"
 # We would like to rename util.c to treputils.so after compilation and without prefix lib
-SET_TARGET_PROPERTIES("trepl" PROPERTIES
-  
+SET_TARGET_PROPERTIES("treplutils" PROPERTIES
   PREFIX ""
   IMPORT_PREFIX "lib" )
 
 # Apple related stuff
 IF(APPLE)
-  SET_TARGET_PROPERTIES("trepl" PROPERTIES
+  SET_TARGET_PROPERTIES("treplutils" PROPERTIES
     LINK_FLAGS "-undefined dynamic_lookup")
 ENDIF()
 
