@@ -544,9 +544,9 @@ _LAST = ''
 -- Readline:
 local readline_ok,readline = pcall(require,'readline')
 local nextline,saveline
-if readline_ok and (os.getenv('HOME') or os.getenv('USERPROFILE')) ~= nil then
+if readline_ok and (os.getenv('TREPL_HISTORY') or os.getenv('HOME') or os.getenv('USERPROFILE')) ~= nil then
    -- Readline found:
-   local history = (os.getenv('HOME') or os.getenv('USERPROFILE')) .. '/.luahistory'
+   local history = os.getenv('TREPL_HISTORY') or ((os.getenv('HOME') or os.getenv('USERPROFILE')) .. '/.luahistory')
    readline.setup()
    readline.read_history(history)
    nextline = function(aux)
