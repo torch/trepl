@@ -590,7 +590,7 @@ function repl()
       -- READ:
       local line = nextline()
 
-      -- Interupt?
+      -- Interrupt?
       if not line or line == 'exit' then
          io.write('Do you really want to exit ([y]/n)? ') io.flush()
          local line = io.read('*l')
